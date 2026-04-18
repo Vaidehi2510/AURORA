@@ -108,19 +108,6 @@ def inject_styles() -> None:
     )
 
 
-def autorefresh_every(seconds: int = 45) -> None:
-    st.components.v1.html(
-        f"""
-        <script>
-        setTimeout(function() {{
-            window.parent.location.reload();
-        }}, {seconds * 1000});
-        </script>
-        """,
-        height=0,
-    )
-
-
 @st.cache_data(ttl=30)
 def load_table(name: str) -> pd.DataFrame:
     with sqlite3.connect(DB_PATH) as conn:
@@ -163,11 +150,9 @@ def parse_json_column(frame: pd.DataFrame, columns: list[str]) -> pd.DataFrame:
 
 
 inject_styles()
-autorefresh_every(45)
 
 with st.sidebar:
     st.markdown("## Engine Control")
-    st.caption("The page auto-refreshes every 45 seconds.")
     if st.button("Refresh Correlation Engine", use_container_width=True):
         run_engine_now()
         st.success("Correlation outputs refreshed.")

@@ -21,8 +21,6 @@ import networkx as nx
 from sklearn.ensemble import HistGradientBoostingClassifier
 from sklearn.isotonic import IsotonicRegression
 
-import xgboost as xgb
-
 
 STOP_ENTITY_TOKENS = {
     "",
@@ -768,22 +766,6 @@ class CorrelationEngine:
             return np.array([0.95 if labels[0] else 0.35], dtype=float)
 
         features = feature_df.to_numpy(dtype=float)
-
-        if xgb is not None:
-            try:
-                model = xgb.XGBClassifier(
-                    n_estimators=64,
-                    max_depth=3,
-                    learning_rate=0.1,
-                    subsample=0.9,
-                    colsample_bytree=0.9,
-                    eval_metric="logloss",
-                )
-                model.fit(features, labels)
-                raw_probabilities = model.predict_proba(features)[:, 1]
-                return self._calibrate_probabilities(raw_probabilities, labels)
-            except Exception:
-                pass
 
         model = HistGradientBoostingClassifier(max_depth=3, learning_rate=0.08, random_state=42)
         model.fit(features, labels)
