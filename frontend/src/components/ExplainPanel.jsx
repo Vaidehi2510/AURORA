@@ -26,6 +26,19 @@ export default function ExplainPanel({ alert, params, onNoteChange }) {
   }
 
   const factors = explainConfidence(alert.events, params)
+  if (!factors) {
+    return (
+      <div className={styles.panel}>
+        <div className={styles.header}>
+          <span className={styles.dot} />
+          <span className={styles.title}>EXPLAINABILITY — {alert.region}</span>
+        </div>
+        <div className={styles.empty}>
+          Need at least two signals in the window to compute factor scores for this alert.
+        </div>
+      </div>
+    )
+  }
   const factorRows = [
     { key: 'temporal',     label: 'Temporal proximity' },
     { key: 'geographic',   label: 'Geographic proximity' },
@@ -100,7 +113,7 @@ export default function ExplainPanel({ alert, params, onNoteChange }) {
           rows={2}
           placeholder="Add investigation notes…"
           value={alert.note ?? ''}
-          onChange={e => onNoteChange(alert.region, e.target.value)}
+          onChange={e => onNoteChange(alert.id, e.target.value)}
         />
       </div>
     </div>

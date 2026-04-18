@@ -58,6 +58,11 @@
   color: var(--amber);
   border: 1px solid color-mix(in srgb, var(--amber) 40%, transparent);
 }
+.liveDb {
+  background: color-mix(in srgb, var(--cyan) 18%, transparent);
+  color: var(--cyan);
+  border: 1px solid color-mix(in srgb, var(--cyan) 45%, transparent);
+}
 
 .feedCount {
   font-size: 10px;

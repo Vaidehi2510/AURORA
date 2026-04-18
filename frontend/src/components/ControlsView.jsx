@@ -39,10 +39,49 @@ function Toggle({ on, onClick }) {
 }
 
 export default function ControlsView({ sentinel }) {
-  const { running, params, sources, toggleFeed, loadScenario, clearAll, updateParam, toggleSource } = sentinel
+  const {
+    running, params, sources, toggleFeed, loadScenario, clearAll, updateParam, toggleSource,
+    liveMode, liveApiAvailable, toggleLiveMode, refreshLive, runBackendEngine, engineRunning,
+  } = sentinel
 
   return (
     <div className={styles.view}>
+
+      {liveApiAvailable && (
+        <div className={styles.panel}>
+          <div className={styles.panelTitle}>BACKEND (SQLITE + ENGINE)</div>
+          <button
+            type="button"
+            className={`${styles.bigBtn} ${liveMode ? styles.btnPause : styles.btnStart}`}
+            onClick={toggleLiveMode}
+          >
+            {liveMode ? '⏸ LEAVE LIVE DB MODE' : '▶ USE LIVE AURORA DATA'}
+          </button>
+          <div style={{ height: 8 }} />
+          <button
+            type="button"
+            className={`${styles.bigBtn} ${styles.btnStart}`}
+            disabled={!liveMode || engineRunning}
+            onClick={refreshLive}
+          >
+            {engineRunning ? '…' : '↻ REFRESH FROM API'}
+          </button>
+          <div style={{ height: 8 }} />
+          <button
+            type="button"
+            className={`${styles.bigBtn} ${styles.btnClear}`}
+            disabled={engineRunning}
+            onClick={runBackendEngine}
+          >
+            {engineRunning ? 'RUNNING ENGINE…' : '⚙ RUN CORRELATION ENGINE (SERVER)'}
+          </button>
+          <p className={styles.hint}>
+            Live mode polls the FastAPI service (same DB as the Streamlit dashboard). Start it with{' '}
+            <code className={styles.code}>uvicorn api:app --port 8000</code> or Docker service{' '}
+            <code className={styles.code}>aurora-api</code>.
+          </p>
+        </div>
+      )}
 
       {/* Feed Control */}
       <div className={styles.panel}>
@@ -50,11 +89,16 @@ export default function ControlsView({ sentinel }) {
         <button
           className={`${styles.bigBtn} ${running ? styles.btnPause : styles.btnStart}`}
           onClick={toggleFeed}
+          disabled={liveMode}
         >
-          {running ? '⏸ PAUSE FEED' : '▶ START FEED'}
+          {liveMode ? 'DEMO FEED (OFF IN LIVE MODE)' : running ? '⏸ PAUSE FEED' : '▶ START FEED'}
         </button>
         <div style={{ height: 8 }} />
-        <button className={`${styles.bigBtn} ${styles.btnClear}`} onClick={clearAll}>
+        <button
+          className={`${styles.bigBtn} ${styles.btnClear}`}
+          onClick={clearAll}
+          disabled={liveMode}
+        >
           ✕ CLEAR ALL DATA
         </button>
       </div>
@@ -71,6 +115,7 @@ export default function ControlsView({ sentinel }) {
           <input
             type="range" min="5" max="60" step="5"
             value={params.timeWindowMin}
+            disabled={liveMode}
             onChange={e => updateParam('timeWindowMin', Number(e.target.value))}
           />
         </div>
@@ -83,6 +128,7 @@ export default function ControlsView({ sentinel }) {
           <input
             type="range" min="0.5" max="10" step="0.5"
             value={params.geoRadiusMi}
+            disabled={liveMode}
             onChange={e => updateParam('geoRadiusMi', Number(e.target.value))}
           />
         </div>
@@ -95,6 +141,7 @@ export default function ControlsView({ sentinel }) {
           <input
             type="range" min="10" max="90" step="5"
             value={params.minConfidence}
+            disabled={liveMode}
             onChange={e => updateParam('minConfidence', Number(e.target.value))}
           />
         </div>
@@ -111,7 +158,7 @@ export default function ControlsView({ sentinel }) {
         ].map(([key, label]) => (
           <div key={key} className={styles.toggleRow}>
             <span className={styles.toggleLabel}>{label}</span>
-            <Toggle on={sources[key]} onClick={() => toggleSource(key)} />
+            <Toggle on={sources[key]} onClick={() => !liveMode && toggleSource(key)} />
           </div>
         ))}
       </div>
@@ -124,6 +171,7 @@ export default function ControlsView({ sentinel }) {
             <button
               key={sc.id}
               className={styles.scenarioBtn}
+              disabled={liveMode}
               onClick={() => loadScenario(sc.fn())}
             >
               <span className={styles.scenarioIcon}>{sc.icon}</span>

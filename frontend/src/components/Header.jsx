@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react'
 import styles from './Header.module.css'
 
-export default function Header({ running, totalIngested }) {
+export default function Header({ running, totalIngested, liveMode, liveError }) {
   const [time, setTime] = useState('')
 
   useEffect(() => {
@@ -18,12 +18,19 @@ export default function Header({ running, totalIngested }) {
         <span>CROSSDOMAIN SENTINEL</span>
       </div>
 
-      <div className={`${styles.statusPill} ${running ? styles.live : styles.paused}`}>
-        {running ? '● LIVE' : '◼ PAUSED'}
+      <div
+        className={`${styles.statusPill} ${
+          liveMode ? styles.liveDb : running ? styles.live : styles.paused
+        }`}
+        title={liveError || ''}
+      >
+        {liveMode ? '◉ AURORA DB' : running ? '● LIVE' : '◼ PAUSED'}
       </div>
 
       <div className={styles.feedCount}>
-        {totalIngested.toLocaleString()} events ingested
+        {liveMode
+          ? liveError ?? 'Synced from SQLite API'
+          : `${totalIngested.toLocaleString()} events ingested`}
       </div>
 
       <div className={styles.right}>

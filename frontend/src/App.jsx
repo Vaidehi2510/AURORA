@@ -19,6 +19,8 @@ export default function App() {
       <Header
         running={sentinel.running}
         totalIngested={sentinel.stats.rawEvents}
+        liveMode={sentinel.liveMode}
+        liveError={sentinel.liveError}
       />
       <NavTabs
         tabs={TABS}

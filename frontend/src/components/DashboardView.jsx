@@ -32,7 +32,13 @@ export default function DashboardView({ sentinel }) {
           />
         </div>
         <div className={styles.mainCol}>
-          <DashboardChatPanel variant="main" />
+          <DashboardChatPanel
+            variant="main"
+            selectedAlert={selectedAlert}
+            alerts={alerts}
+            ticker={ticker}
+            stats={stats}
+          />
         </div>
         <div className={styles.sideFeed}>
           <EventTicker events={ticker} />
