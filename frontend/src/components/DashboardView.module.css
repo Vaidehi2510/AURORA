@@ -1,0 +1,23 @@
+.view {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+}
+
+.body {
+  flex: 1;
+  display: grid;
+  grid-template-columns: 1fr 320px;
+  gap: 10px;
+  padding: 10px 20px;
+  overflow: hidden;
+}
+
+.leftCol {
+  display: grid;
+  grid-template-rows: 1fr auto;
+  gap: 10px;
+  overflow: hidden;
+  min-height: 0;
+}
