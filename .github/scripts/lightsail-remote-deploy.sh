@@ -50,16 +50,22 @@ fi
 .venv/bin/pip install --upgrade pip
 .venv/bin/pip install -r requirements.txt
 
-# #region agent log
-echo "debug session=e3bfc2 hypothesis=C prebuilt_frontend=$([ -f frontend/dist/index.html ] && echo yes || echo no)"
-# #endregion
-
 if [ -f frontend/dist/index.html ]; then
   echo "=== Frontend: using prebuilt dist from CI (skipping npm/vite on instance) ==="
 else
   echo "=== Frontend: building on instance (no dist/index.html) ==="
   (cd frontend && npm ci && npm run build)
 fi
+
+if [ ! -f frontend/dist/index.html ]; then
+  echo "frontend/dist/index.html is missing after build; cannot configure nginx." >&2
+  exit 1
+fi
+
+echo "=== Publishing static assets for nginx (www-data) ==="
+sudo mkdir -p /var/www/aurora-dashboard
+sudo rsync -a --delete "$APP/frontend/dist/" /var/www/aurora-dashboard/
+sudo chown -R www-data:www-data /var/www/aurora-dashboard
 
 sudo install -m0644 "$APP/.github/scripts/aurora-nginx-lightsail.conf" /etc/nginx/sites-available/aurora
 sudo rm -f /etc/nginx/sites-enabled/default
@@ -89,3 +95,35 @@ UNIT
 sudo systemctl daemon-reload
 sudo systemctl enable aurora-api
 sudo systemctl restart aurora-api
+
+sleep 2
+if ! systemctl is-active --quiet aurora-api; then
+  echo "=== aurora-api failed to stay active ===" >&2
+  systemctl status aurora-api --no-pager -l >&2 || true
+  journalctl -u aurora-api -n 80 --no-pager >&2 || true
+  exit 1
+fi
+
+echo "=== Post-deploy smoke (localhost) ==="
+UH=$(curl -sS -o /tmp/aurora-uvicorn-health.json -w "%{http_code}" http://127.0.0.1:8000/api/health) || UH=000
+NH=$(curl -sS -o /tmp/aurora-nginx-api-health.json -w "%{http_code}" http://127.0.0.1/api/health) || NH=000
+RH=$(curl -sS -o /tmp/aurora-nginx-root.html -w "%{http_code}" http://127.0.0.1/) || RH=000
+echo "HTTP codes: uvicorn_health=$UH nginx_api_health=$NH nginx_root=$RH"
+head -c 240 /tmp/aurora-uvicorn-health.json 2>/dev/null || true
+echo
+head -c 240 /tmp/aurora-nginx-api-health.json 2>/dev/null || true
+echo
+head -c 120 /tmp/aurora-nginx-root.html 2>/dev/null || true
+echo
+
+if [ "$UH" != "200" ] || [ "$NH" != "200" ] || [ "$RH" != "200" ]; then
+  echo "=== Smoke check failed (expected 200 for all three) ===" >&2
+  echo "=== nginx error.log (tail) ===" >&2
+  sudo tail -n 40 /var/log/nginx/error.log 2>/dev/null >&2 || true
+  echo "=== aurora-api journal (tail) ===" >&2
+  journalctl -u aurora-api -n 40 --no-pager >&2 || true
+  exit 1
+fi
+
+echo "=== nginx error.log (tail) ==="
+sudo tail -n 25 /var/log/nginx/error.log 2>/dev/null || true
