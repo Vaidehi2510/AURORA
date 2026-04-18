@@ -55,6 +55,16 @@ jobs:
           npm ci
           npm run build
 
+      - name: Pack frontend dist for Lightsail deploy
+        working-directory: frontend
+        run: tar czf "${GITHUB_WORKSPACE}/frontend-dist.tar.gz" dist
+
+      - name: Upload frontend dist archive
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-dist
+          path: frontend-dist.tar.gz
+
   deploy-lightsail:
     needs: [python, frontend]
     if: >-
@@ -74,6 +84,16 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+
+      - name: Download prebuilt frontend (avoids vite on nano RAM)
+        uses: actions/download-artifact@v4
+        with:
+          name: frontend-dist
+
+      - name: Extract frontend dist into repo tree
+        run: |
+          mkdir -p frontend
+          tar xzf frontend-dist.tar.gz -C frontend
 
       - uses: actions/setup-python@v5
         with:
@@ -153,6 +173,7 @@ jobs:
             --exclude '.git' \
             --exclude 'frontend/node_modules' \
             --exclude 'frontend/.vite' \
+            --exclude 'frontend-dist.tar.gz' \
             --exclude '__pycache__' \
             --exclude '.venv' \
             -e "ssh -i $HOME/.ssh/lightsail.pem -o StrictHostKeyChecking=accept-new" \

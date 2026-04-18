@@ -50,7 +50,16 @@ fi
 .venv/bin/pip install --upgrade pip
 .venv/bin/pip install -r requirements.txt
 
-(cd frontend && npm ci && npm run build)
+# #region agent log
+echo "debug session=e3bfc2 hypothesis=C prebuilt_frontend=$([ -f frontend/dist/index.html ] && echo yes || echo no)"
+# #endregion
+
+if [ -f frontend/dist/index.html ]; then
+  echo "=== Frontend: using prebuilt dist from CI (skipping npm/vite on instance) ==="
+else
+  echo "=== Frontend: building on instance (no dist/index.html) ==="
+  (cd frontend && npm ci && npm run build)
+fi
 
 sudo install -m0644 "$APP/.github/scripts/aurora-nginx-lightsail.conf" /etc/nginx/sites-available/aurora
 sudo rm -f /etc/nginx/sites-enabled/default
