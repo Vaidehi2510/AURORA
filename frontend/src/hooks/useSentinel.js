@@ -5,6 +5,7 @@ import { synthesizeAlert } from '../engine/llmSynthesis.js'
 import { DEFAULT_PARAMS, EVENT_TYPES } from '../data/constants.js'
 import {
   auroraApiConfigured,
+  fetchRawData,
   fetchSnapshot,
   runEngineOnServer,
 } from '../api/auroraClient.js'
@@ -18,10 +19,20 @@ export function useSentinel() {
   const [events,          setEvents]         = useState([])
   const [alerts,          setAlerts]         = useState([])
   const [ticker,          setTicker]         = useState([])
+  const [rawData,         setRawData]        = useState({
+    summary: {},
+    domains: [],
+    sources: [],
+    events: [],
+    matchingEvents: 0,
+    limit: 100,
+    offset: 0,
+    dbMissing: false,
+  })
   const [selectedAlertId, setSelectedAlertId]= useState(null)
   const [running,         setRunning]        = useState(false)
   const [params,          setParams]         = useState(DEFAULT_PARAMS)
-  const [sources,         setSources]        = useState({ cyber: true, physical: true, osint: true, llm: true })
+  const [sources,         setSources]        = useState({ cyber: true, physical: true, osint: true })
   const [totalIngested,   setTotalIngested]  = useState(0)
   const [liveMode,        setLiveMode]       = useState(false)
   const [liveFeedPaused,  setLiveFeedPaused] = useState(false)
@@ -66,6 +77,17 @@ export function useSentinel() {
       setLiveError(e instanceof Error ? e.message : 'Could not reach AURORA API')
     }
   }, [applySnapshot])
+
+  const loadRawDataOnce = useCallback(async (options = {}) => {
+    if (!auroraApiConfigured()) return
+    try {
+      const data = await fetchRawData(options)
+      setRawData(data)
+      setLiveError(null)
+    } catch (e) {
+      setLiveError(e instanceof Error ? e.message : 'Could not reach AURORA API')
+    }
+  }, [])
 
   useEffect(() => {
     if (!liveMode) setLiveFeedPaused(false)
@@ -123,7 +145,6 @@ export function useSentinel() {
   // ── LLM synthesis (async, updates alert in place) ──────────
   const triggerLLM = useCallback(async (incident) => {
     if (liveModeRef.current) return
-    if (!sourcesRef.current.llm) return
 
     // Mark as loading
     const setLoading = (loading) => {
@@ -242,6 +263,10 @@ export function useSentinel() {
     if (liveModeRef.current) pollOnce()
   }, [pollOnce])
 
+  const refreshRawData = useCallback((options = {}) => {
+    loadRawDataOnce(options)
+  }, [loadRawDataOnce])
+
   const runBackendEngine = useCallback(async () => {
     if (!auroraApiConfigured()) return
     setEngineRunning(true)
@@ -277,10 +302,12 @@ export function useSentinel() {
     liveMode,
     liveFeedPaused,
     liveError,
+    rawData,
     liveApiAvailable: auroraApiConfigured(),
     toggleLiveMode,
     toggleLiveFeedPause,
     refreshLive,
+    refreshRawData,
     runBackendEngine,
     engineRunning,
   }

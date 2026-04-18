@@ -226,7 +226,6 @@ export default function ControlsView({ sentinel }) {
           ['cyber',    'Cyber Telemetry'],
           ['physical', 'Physical Incidents'],
           ['osint',    'OSINT / Public'],
-          ['llm',      'LLM Alert Synthesis'],
         ].map(([key, label]) => (
           <div key={key} className={styles.toggleRow}>
             <span className={styles.toggleLabel}>{label}</span>

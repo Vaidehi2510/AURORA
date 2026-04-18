@@ -245,6 +245,196 @@ def snapshot() -> dict[str, object]:
     }
 
 
+@app.get("/api/raw-data")
+def raw_data(
+    scope: str = "all",
+    domain: str = "all",
+    search: str = "",
+    limit: int = 100,
+    offset: int = 0,
+) -> dict[str, object]:
+    """Overview of unified_events for raw-database inspection in the React app."""
+    limit = max(1, min(int(limit), 500))
+    offset = max(0, int(offset))
+    if not DB_PATH.is_file():
+        return {
+            "summary": {
+                "total_events": 0,
+                "live_events": 0,
+                "historical_events": 0,
+                "simulated_events": 0,
+                "unique_sources": 0,
+                "latest_timestamp": None,
+                "earliest_timestamp": None,
+            },
+            "domains": [],
+            "sources": [],
+            "events": [],
+            "matchingEvents": 0,
+            "limit": limit,
+            "offset": offset,
+            "scope": scope,
+            "domain": domain,
+            "search": search,
+            "dbMissing": True,
+        }
+
+    with sqlite3.connect(DB_PATH) as conn:
+        conn.row_factory = sqlite3.Row
+
+        if not _table_exists(conn, "unified_events"):
+            return {
+                "summary": {
+                    "total_events": 0,
+                    "live_events": 0,
+                    "historical_events": 0,
+                    "simulated_events": 0,
+                    "unique_sources": 0,
+                    "latest_timestamp": None,
+                    "earliest_timestamp": None,
+                },
+                "domains": [],
+                "sources": [],
+                "events": [],
+                "matchingEvents": 0,
+                "limit": limit,
+                "offset": offset,
+                "scope": scope,
+                "domain": domain,
+                "search": search,
+                "dbMissing": False,
+            }
+
+        summary_row = conn.execute(
+            """
+            SELECT
+                COUNT(*) AS total_events,
+                SUM(CASE WHEN LOWER(COALESCE(is_live, '')) = 'true' THEN 1 ELSE 0 END) AS live_events,
+                SUM(CASE WHEN LOWER(COALESCE(is_live, '')) != 'true' THEN 1 ELSE 0 END) AS historical_events,
+                SUM(CASE WHEN LOWER(COALESCE(is_simulated, '')) = 'true' THEN 1 ELSE 0 END) AS simulated_events,
+                COUNT(DISTINCT NULLIF(source, '')) AS unique_sources,
+                MIN(timestamp) AS earliest_timestamp,
+                MAX(timestamp) AS latest_timestamp
+            FROM unified_events
+            """
+        ).fetchone()
+
+        domain_rows = conn.execute(
+            """
+            SELECT COALESCE(NULLIF(domain, ''), 'unknown') AS name, COUNT(*) AS count
+            FROM unified_events
+            GROUP BY COALESCE(NULLIF(domain, ''), 'unknown')
+            ORDER BY count DESC, name ASC
+            """
+        ).fetchall()
+
+        source_rows = conn.execute(
+            """
+            SELECT COALESCE(NULLIF(source, ''), 'unknown') AS name, COUNT(*) AS count
+            FROM unified_events
+            GROUP BY COALESCE(NULLIF(source, ''), 'unknown')
+            ORDER BY count DESC, name ASC
+            LIMIT 12
+            """
+        ).fetchall()
+
+        where_clauses: list[str] = []
+        params: list[object] = []
+
+        scope_norm = (scope or "all").strip().lower()
+        domain_norm = (domain or "all").strip().lower()
+        search_norm = (search or "").strip().lower()
+
+        if scope_norm == "live":
+            where_clauses.append("LOWER(COALESCE(is_live, '')) = 'true'")
+        elif scope_norm == "historical":
+            where_clauses.append("LOWER(COALESCE(is_live, '')) != 'true'")
+        elif scope_norm == "simulated":
+            where_clauses.append("LOWER(COALESCE(is_simulated, '')) = 'true'")
+
+        if domain_norm != "all":
+            where_clauses.append("LOWER(COALESCE(domain, 'unknown')) = ?")
+            params.append(domain_norm)
+
+        if search_norm:
+            like = f"%{search_norm}%"
+            where_clauses.append(
+                """
+                (
+                    LOWER(COALESCE(event_id, '')) LIKE ?
+                    OR LOWER(COALESCE(source, '')) LIKE ?
+                    OR LOWER(COALESCE(domain, '')) LIKE ?
+                    OR LOWER(COALESCE(event_type, '')) LIKE ?
+                    OR LOWER(COALESCE(title, '')) LIKE ?
+                    OR LOWER(COALESCE(description, '')) LIKE ?
+                    OR LOWER(COALESCE(city, '')) LIKE ?
+                    OR LOWER(COALESCE(country, '')) LIKE ?
+                    OR LOWER(COALESCE(facility, '')) LIKE ?
+                )
+                """
+            )
+            params.extend([like] * 9)
+
+        where_sql = ""
+        if where_clauses:
+            where_sql = "WHERE " + " AND ".join(where_clauses)
+
+        count_row = conn.execute(
+            f"SELECT COUNT(*) AS matching_events FROM unified_events {where_sql}",
+            params,
+        ).fetchone()
+
+        event_rows = conn.execute(
+            f"""
+            SELECT
+                event_id, source, domain, event_type, title, description, timestamp,
+                city, country, facility, severity, is_live, is_simulated
+            FROM unified_events
+            {where_sql}
+            ORDER BY timestamp DESC
+            LIMIT ? OFFSET ?
+            """,
+            [*params, limit, offset],
+        ).fetchall()
+
+    events_out = []
+    for row in event_rows:
+        region = " · ".join(
+            part for part in (row["facility"], row["city"], row["country"]) if part
+        ) or "Unknown"
+        events_out.append(
+            {
+                "id": row["event_id"],
+                "source": row["source"] or "unknown",
+                "domain": row["domain"] or "unknown",
+                "type": _domain_to_type(row["domain"] or ""),
+                "eventType": row["event_type"] or "",
+                "title": row["title"] or "(no title)",
+                "description": row["description"] or "",
+                "timestamp": _parse_ts(row["timestamp"]),
+                "timestampRaw": row["timestamp"],
+                "region": region,
+                "severity": _severity_label(row["severity"]),
+                "isLive": str(row["is_live"]).lower() == "true",
+                "isSimulated": str(row["is_simulated"]).lower() == "true",
+            }
+        )
+
+    return {
+        "summary": dict(summary_row) if summary_row is not None else {},
+        "domains": [dict(row) for row in domain_rows],
+        "sources": [dict(row) for row in source_rows],
+        "events": events_out,
+        "matchingEvents": int(count_row["matching_events"]) if count_row is not None else 0,
+        "limit": limit,
+        "offset": offset,
+        "scope": scope_norm,
+        "domain": domain_norm,
+        "search": search,
+        "dbMissing": False,
+    }
+
+
 class AnalystChatMessage(BaseModel):
     role: Literal["system", "user", "assistant"]
     content: str = Field(..., max_length=16_000)
