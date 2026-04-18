@@ -1,7 +1,7 @@
 name: CI
 
-# Lightsail CD (VM instance): ensures instance "Nat-Sec-Hackathon-Cyber-Dashboard" exists in us-east-1,
-# rsyncs the repo, writes .env, runs native stack (venv + uvicorn + nginx) like local dev — not Docker on the VM.
+# Lightsail CD (VM): ensures instance "Nat-Sec-Hackathon-Cyber-Dashboard" exists in us-east-1,
+# rsyncs the repo, writes .env, runs venv + uvicorn + nginx on the instance (same idea as local README flow).
 #
 # Secrets: AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, LIGHTSAIL_SSH_PRIVATE_KEY (PEM for the instance key),
 #   LIGHTSAIL_KEY_PAIR_NAME (Lightsail key pair name — required when the workflow creates a new instance),
@@ -54,29 +54,6 @@ jobs:
         run: |
           npm ci
           npm run build
-
-  docker:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: docker/setup-buildx-action@v3
-
-      - name: Build API image (Dockerfile)
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          file: Dockerfile
-          push: false
-          tags: aurora:ci
-
-      - name: Build web image (frontend/Dockerfile)
-        uses: docker/build-push-action@v6
-        with:
-          context: .
-          file: frontend/Dockerfile
-          push: false
-          tags: aurora-web:ci
 
   deploy-lightsail:
     needs: [python, frontend]
