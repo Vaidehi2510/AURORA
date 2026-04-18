@@ -3,6 +3,7 @@ import StatCards from './StatCards.jsx'
 import AlertsList from './AlertsList.jsx'
 import ExplainPanel from './ExplainPanel.jsx'
 import EventTicker from './EventTicker.jsx'
+import DashboardChatPanel from './DashboardChatPanel.jsx'
 import styles from './DashboardView.module.css'
 
 export default function DashboardView({ sentinel }) {
@@ -30,7 +31,12 @@ export default function DashboardView({ sentinel }) {
             onNoteChange={updateNote}
           />
         </div>
-        <EventTicker events={ticker} />
+        <div className={styles.mainCol}>
+          <DashboardChatPanel variant="main" />
+        </div>
+        <div className={styles.sideFeed}>
+          <EventTicker events={ticker} />
+        </div>
       </div>
     </div>
   )
