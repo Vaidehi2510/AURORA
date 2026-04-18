@@ -134,20 +134,49 @@ jobs:
           echo "${{ secrets.LIGHTSAIL_SSH_PRIVATE_KEY }}" > ~/.ssh/lightsail.pem
           chmod 600 ~/.ssh/lightsail.pem
 
-      - name: Wait for SSH and Docker
+      - name: Wait for SSH, cloud-init, and Docker
         env:
           INSTANCE_IP: ${{ steps.ensure_instance.outputs.instance_ip }}
         run: |
-          for i in $(seq 1 90); do
-            if ssh -i ~/.ssh/lightsail.pem -o ConnectTimeout=10 -o BatchMode=yes -o StrictHostKeyChecking=accept-new \
-              "ubuntu@${INSTANCE_IP}" 'sudo docker info' >/dev/null 2>&1; then
-              echo "SSH and Docker are ready."
+          set -e
+          SSH_OPTS="-i $HOME/.ssh/lightsail.pem -o IdentitiesOnly=yes -o ConnectTimeout=15 -o BatchMode=yes -o StrictHostKeyChecking=accept-new -o ServerAliveInterval=15"
+          TARGET="ubuntu@${INSTANCE_IP}"
+
+          echo "=== Phase 1: SSH (port 22 + key) ==="
+          for i in $(seq 1 60); do
+            if ssh $SSH_OPTS "$TARGET" 'echo ssh-ok' >/tmp/ssh-test.log 2>&1; then
+              echo "SSH is working (attempt $i)."
+              break
+            fi
+            if [ "$i" -eq 60 ]; then
+              echo "SSH never succeeded. Last attempt log:" >&2
+              cat /tmp/ssh-test.log >&2 || true
+              echo "Check: LIGHTSAIL_SSH_PRIVATE_KEY matches the key on this instance; user is ubuntu; security group allows 22." >&2
+              exit 1
+            fi
+            echo "Waiting for SSH... ($i/60)"
+            sleep 5
+          done
+
+          echo "=== Phase 2: cloud-init (first-boot scripts) ==="
+          ssh $SSH_OPTS "$TARGET" 'sudo cloud-init status --wait' </dev/null || echo "cloud-init wait returned non-zero (continuing if Docker is up)"
+
+          echo "=== Phase 3: Docker daemon ==="
+          for j in $(seq 1 90); do
+            if ssh $SSH_OPTS "$TARGET" 'sudo docker info' >/tmp/docker-test.log 2>&1; then
+              echo "Docker is ready (attempt $j)."
               exit 0
             fi
-            echo "Waiting for SSH/Docker... ($i)"
+            if [ "$((j % 10))" -eq 0 ]; then
+              echo "--- docker check failed at $j; remote hint (if any): ---"
+              tail -20 /tmp/docker-test.log || true
+            fi
+            echo "Waiting for Docker (cloud-init may still be installing)... ($j/90)"
             sleep 10
           done
-          echo "Timeout waiting for Docker on the instance." >&2
+          echo "Timeout waiting for Docker. Remote output:" >&2
+          cat /tmp/docker-test.log >&2 || true
+          ssh $SSH_OPTS "$TARGET" 'sudo cloud-init status --long 2>/dev/null || true; tail -80 /var/log/cloud-init-output.log 2>/dev/null || true' >&2 || true
           exit 1
 
       - name: Rsync application to instance
