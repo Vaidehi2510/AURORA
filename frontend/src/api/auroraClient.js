@@ -62,6 +62,15 @@ export async function fetchAnalystChatStatus() {
   return res.json()
 }
 
+/** @returns {Promise<{ tts: boolean, stt: boolean, ttsModel: string, sttModel: string, voiceId: string }>} */
+export async function fetchVoiceStatus() {
+  const res = await fetch(apiUrl('/api/voice/status'))
+  if (!res.ok) {
+    throw new Error(`Voice status failed (${res.status})`)
+  }
+  return res.json()
+}
+
 /**
  * @param {{ messages: { role: string, content: string }[], context?: object }} payload
  * @returns {Promise<{ reply: string }>}
@@ -83,4 +92,49 @@ export async function postAnalystChat(payload) {
     throw new Error(detail)
   }
   return res.json()
+}
+
+/**
+ * @param {FormData} formData
+ * @returns {Promise<{ text: string, rawText: string, averageConfidence?: number, uncertainTerms?: string[] }>}
+ */
+export async function postVoiceTranscription(formData) {
+  const res = await fetch(apiUrl('/api/voice/transcribe'), {
+    method: 'POST',
+    body: formData,
+  })
+  if (!res.ok) {
+    let detail = `Voice transcription failed (${res.status})`
+    try {
+      const j = await res.json()
+      if (j?.detail) detail = typeof j.detail === 'string' ? j.detail : JSON.stringify(j.detail)
+    } catch {
+      /* ignore */
+    }
+    throw new Error(detail)
+  }
+  return res.json()
+}
+
+/**
+ * @param {{ text: string }} payload
+ * @returns {Promise<Blob>}
+ */
+export async function postVoiceSpeech(payload) {
+  const res = await fetch(apiUrl('/api/voice/speak'), {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  })
+  if (!res.ok) {
+    let detail = `Voice synthesis failed (${res.status})`
+    try {
+      const j = await res.json()
+      if (j?.detail) detail = typeof j.detail === 'string' ? j.detail : JSON.stringify(j.detail)
+    } catch {
+      /* ignore */
+    }
+    throw new Error(detail)
+  }
+  return res.blob()
 }

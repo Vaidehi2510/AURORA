@@ -13,9 +13,16 @@ from pathlib import Path
 from typing import Any, Literal
 
 from dotenv import load_dotenv
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import Response
 from pydantic import BaseModel, Field
+
+from elevenlabs_voice import (
+    synthesize_speech_bytes,
+    transcribe_audio_bytes,
+    voice_status,
+)
 
 _APP_ROOT = Path(__file__).resolve().parent
 DB_PATH = _APP_ROOT / "db" / "aurora.db"
@@ -255,6 +262,10 @@ class AnalystChatRequest(BaseModel):
     context: dict[str, Any] | None = None
 
 
+class VoiceSpeakRequest(BaseModel):
+    text: str = Field(..., min_length=1, max_length=12_000)
+
+
 @app.get("/api/analyst-chat/status")
 def analyst_chat_status() -> dict[str, Any]:
     from correlation_engine.runtime import env
@@ -321,6 +332,71 @@ def analyst_chat(body: AnalystChatRequest) -> dict[str, str]:
     if not reply:
         raise HTTPException(status_code=502, detail="Empty model response")
     return {"reply": reply}
+
+
+@app.get("/api/voice/status")
+def api_voice_status() -> dict[str, Any]:
+    return voice_status()
+
+
+@app.post("/api/voice/transcribe")
+async def api_voice_transcribe(
+    file: UploadFile = File(...),
+    context_json: str | None = Form(default=None),
+) -> dict[str, Any]:
+    status = voice_status()
+    if not status["stt"]:
+        raise HTTPException(
+            status_code=503,
+            detail="ElevenLabs STT is not configured. Set ELEVENLABS_API_KEY in the environment.",
+        )
+
+    context: Any = None
+    if context_json:
+        try:
+            context = json.loads(context_json)
+        except Exception:
+            context = None
+
+    payload = await file.read()
+    if not payload:
+        raise HTTPException(status_code=400, detail="Uploaded audio file was empty.")
+
+    try:
+        return transcribe_audio_bytes(
+            payload,
+            filename=file.filename or "voice-input.webm",
+            content_type=file.content_type or "audio/webm",
+            context=context,
+        )
+    except HTTPException:
+        raise
+    except Exception as exc:
+        raise HTTPException(status_code=502, detail=f"Voice transcription failed: {str(exc)[:700]}") from exc
+
+
+@app.post("/api/voice/speak")
+def api_voice_speak(body: VoiceSpeakRequest) -> Response:
+    status = voice_status()
+    if not status["tts"]:
+        raise HTTPException(
+            status_code=503,
+            detail="ElevenLabs TTS is not configured. Set ELEVENLABS_API_KEY in the environment.",
+        )
+
+    try:
+        audio = synthesize_speech_bytes(body.text)
+    except Exception as exc:
+        raise HTTPException(status_code=502, detail=f"Voice synthesis failed: {str(exc)[:700]}") from exc
+
+    return Response(
+        content=audio,
+        media_type="audio/mpeg",
+        headers={
+            "Cache-Control": "no-store",
+            "Content-Disposition": 'inline; filename="aurora-voice.mp3"',
+        },
+    )
 
 
 @app.post("/api/run-engine")

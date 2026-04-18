@@ -1,9 +1,14 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import {
   scenarioInfrastructure,
   scenarioIntrusion,
   scenarioFalsePositive,
 } from '../data/eventGenerator.js'
+import {
+  auroraApiConfigured,
+  fetchAnalystChatStatus,
+  fetchVoiceStatus,
+} from '../api/auroraClient.js'
 import styles from './ControlsView.module.css'
 
 const SCENARIOS = [
@@ -43,6 +48,25 @@ export default function ControlsView({ sentinel }) {
     running, params, sources, toggleFeed, loadScenario, clearAll, updateParam, toggleSource,
     liveMode, liveApiAvailable, toggleLiveMode, refreshLive, runBackendEngine, engineRunning,
   } = sentinel
+  const [voiceInfo, setVoiceInfo] = useState(null)
+  const [chatInfo, setChatInfo] = useState(null)
+
+  useEffect(() => {
+    if (!auroraApiConfigured()) return undefined
+    let cancelled = false
+    ;(async () => {
+      const [chatResult, voiceResult] = await Promise.allSettled([
+        fetchAnalystChatStatus(),
+        fetchVoiceStatus(),
+      ])
+      if (cancelled) return
+      setChatInfo(chatResult.status === 'fulfilled' ? chatResult.value : { configured: false })
+      setVoiceInfo(voiceResult.status === 'fulfilled' ? voiceResult.value : { configured: false })
+    })()
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   return (
     <div className={styles.view}>
@@ -80,6 +104,54 @@ export default function ControlsView({ sentinel }) {
             <code className={styles.code}>uvicorn api:app --port 8000</code> or Docker service{' '}
             <code className={styles.code}>aurora-api</code>.
           </p>
+        </div>
+      )}
+
+      {liveApiAvailable && (
+        <div className={styles.panel}>
+          <div className={styles.panelTitle}>VOICE + AI STATUS</div>
+          <div className={styles.statusGrid}>
+            <div className={styles.statusRow}>
+              <span className={styles.toggleLabel}>Analyst chat</span>
+              <span className={chatInfo?.configured ? styles.statusGood : styles.statusBad}>
+                {chatInfo?.configured ? 'READY' : 'OFFLINE'}
+              </span>
+            </div>
+            <div className={styles.statusRow}>
+              <span className={styles.toggleLabel}>ElevenLabs STT</span>
+              <span className={voiceInfo?.stt ? styles.statusGood : styles.statusBad}>
+                {voiceInfo?.stt ? 'READY' : 'OFFLINE'}
+              </span>
+            </div>
+            <div className={styles.statusRow}>
+              <span className={styles.toggleLabel}>ElevenLabs TTS</span>
+              <span className={voiceInfo?.tts ? styles.statusGood : styles.statusBad}>
+                {voiceInfo?.tts ? 'READY' : 'OFFLINE'}
+              </span>
+            </div>
+          </div>
+          <div className={styles.metaStack}>
+            {chatInfo?.model && (
+              <div className={styles.metaLine}>
+                Chat model: <code className={styles.code}>{chatInfo.model}</code>
+              </div>
+            )}
+            {voiceInfo?.sttModel && (
+              <div className={styles.metaLine}>
+                STT model: <code className={styles.code}>{voiceInfo.sttModel}</code>
+              </div>
+            )}
+            {voiceInfo?.ttsModel && (
+              <div className={styles.metaLine}>
+                TTS model: <code className={styles.code}>{voiceInfo.ttsModel}</code>
+              </div>
+            )}
+            {voiceInfo?.voiceId && (
+              <div className={styles.metaLine}>
+                Voice ID: <code className={styles.code}>{voiceInfo.voiceId}</code>
+              </div>
+            )}
+          </div>
         </div>
       )}
 
