@@ -1,0 +1,3 @@
+# Linux containers and POSIX tools require LF; CRLF breaks shebangs (env: 'sh\r').
+*.sh text eol=lf
+Dockerfile text eol=lf

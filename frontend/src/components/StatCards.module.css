@@ -1,0 +1,53 @@
+.grid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 10px;
+  padding: 12px 20px;
+  background: var(--bg2);
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+
+.card {
+  background: var(--bg3);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 10px 14px;
+  position: relative;
+  overflow: hidden;
+}
+.card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+}
+.cyan::before  { background: var(--cyan); }
+.red::before   { background: var(--red); }
+.amber::before { background: var(--amber); }
+.blue::before  { background: var(--blue); }
+
+.label {
+  font-size: 10px;
+  color: var(--text3);
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  font-family: var(--font-mono);
+}
+
+.value {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 600;
+  margin: 2px 0;
+  line-height: 1;
+}
+.val_cyan  { color: var(--cyan); }
+.val_red   { color: var(--red); }
+.val_amber { color: var(--amber); }
+.val_blue  { color: var(--blue); }
+
+.sub {
+  font-size: 10px;
+  color: var(--text3);
+}

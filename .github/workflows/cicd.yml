@@ -1,0 +1,215 @@
+name: CI
+
+# Lightsail CD (VM instance): ensures instance "Nat-Sec-Hackathon-Cyber-Dashboard" exists in us-east-1,
+# rsyncs the repo, writes .env, runs native stack (venv + uvicorn + nginx) like local dev — not Docker on the VM.
+#
+# Secrets: AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, LIGHTSAIL_SSH_PRIVATE_KEY (PEM for the instance key),
+#   LIGHTSAIL_KEY_PAIR_NAME (Lightsail key pair name — required when the workflow creates a new instance),
+#   OPENROUTER_API_KEY (optional but recommended for the API on the server).
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+  workflow_dispatch:
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  python:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Build SQLite database for tests
+        run: python scripts/build_aurora_db.py
+
+      - name: Run unit tests
+        run: python -m unittest discover -s tests -p "test_*.py" -v
+
+  frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install and build
+        working-directory: frontend
+        run: |
+          npm ci
+          npm run build
+
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: docker/setup-buildx-action@v3
+
+      - name: Build API image (Dockerfile)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: Dockerfile
+          push: false
+          tags: aurora:ci
+
+      - name: Build web image (frontend/Dockerfile)
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: frontend/Dockerfile
+          push: false
+          tags: aurora-web:ci
+
+  deploy-lightsail:
+    needs: [python, frontend]
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'push' &&
+       (github.ref == 'refs/heads/main' || github.ref == 'refs/heads/master'))
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    env:
+      AWS_REGION: us-east-1
+      LIGHTSAIL_INSTANCE_NAME: Nat-Sec-Hackathon-Cyber-Dashboard
+      LIGHTSAIL_BUNDLE_ID: nano_2_0
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+
+      - name: Build app database for deploy bundle
+        run: |
+          pip install -r requirements.txt
+          mkdir -p db artifacts/embeddings
+          python scripts/build_aurora_db.py
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.AWS_REGION }}
+
+      - id: ensure_instance
+        name: Ensure Lightsail instance (VM) exists
+        run: |
+          chmod +x .github/scripts/lightsail-ensure-instance.sh .github/scripts/lightsail-wait-operation.sh
+          BOOT="${GITHUB_WORKSPACE}/.github/scripts/lightsail-instance-bootstrap.sh"
+          IP=$(.github/scripts/lightsail-ensure-instance.sh \
+            "$AWS_REGION" \
+            "$LIGHTSAIL_INSTANCE_NAME" \
+            "${{ secrets.LIGHTSAIL_KEY_PAIR_NAME }}" \
+            "$LIGHTSAIL_BUNDLE_ID" \
+            "ubuntu_22_04" \
+            "us-east-1a" \
+            "$BOOT")
+          echo "instance_ip=$IP" >> "$GITHUB_OUTPUT"
+
+      - name: Install SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.LIGHTSAIL_SSH_PRIVATE_KEY }}" > ~/.ssh/lightsail.pem
+          chmod 600 ~/.ssh/lightsail.pem
+
+      - name: Wait for SSH, cloud-init, and runtime stack
+        env:
+          INSTANCE_IP: ${{ steps.ensure_instance.outputs.instance_ip }}
+        run: |
+          set -e
+          SSH_OPTS="-i $HOME/.ssh/lightsail.pem -o IdentitiesOnly=yes -o ConnectTimeout=15 -o BatchMode=yes -o StrictHostKeyChecking=accept-new -o ServerAliveInterval=15"
+          TARGET="ubuntu@${INSTANCE_IP}"
+
+          echo "=== Phase 1: SSH (port 22 + key) ==="
+          for i in $(seq 1 60); do
+            if ssh $SSH_OPTS "$TARGET" 'echo ssh-ok' >/tmp/ssh-test.log 2>&1; then
+              echo "SSH is working (attempt $i)."
+              break
+            fi
+            if [ "$i" -eq 60 ]; then
+              echo "SSH never succeeded. Last attempt log:" >&2
+              cat /tmp/ssh-test.log >&2 || true
+              echo "Check: LIGHTSAIL_SSH_PRIVATE_KEY matches the key on this instance; user is ubuntu; security group allows 22." >&2
+              exit 1
+            fi
+            echo "Waiting for SSH... ($i/60)"
+            sleep 5
+          done
+
+          echo "=== Phase 2: cloud-init (first-boot scripts) ==="
+          ssh $SSH_OPTS "$TARGET" 'sudo cloud-init status --wait' </dev/null || echo "cloud-init wait returned non-zero (continuing)"
+
+          echo "=== Phase 3: Python 3.12 + Node + nginx (first-boot packages) ==="
+          for j in $(seq 1 90); do
+            if ssh $SSH_OPTS "$TARGET" 'command -v python3.12 >/dev/null && command -v node >/dev/null && command -v nginx >/dev/null' >/tmp/ready-test.log 2>&1; then
+              echo "Runtime stack is ready (attempt $j)."
+              exit 0
+            fi
+            if [ "$((j % 10))" -eq 0 ]; then
+              echo "--- stack check failed at $j; remote hint (if any): ---"
+              tail -20 /tmp/ready-test.log || true
+            fi
+            echo "Waiting for apt/cloud-init (python3.12, node, nginx)... ($j/90)"
+            sleep 10
+          done
+          echo "Timeout waiting for first-boot packages. Remote output:" >&2
+          cat /tmp/ready-test.log >&2 || true
+          ssh $SSH_OPTS "$TARGET" 'sudo cloud-init status --long 2>/dev/null || true; tail -120 /var/log/cloud-init-output.log 2>/dev/null || true' >&2 || true
+          exit 1
+
+      - name: Rsync application to instance
+        env:
+          INSTANCE_IP: ${{ steps.ensure_instance.outputs.instance_ip }}
+        run: |
+          rsync -az --delete \
+            --exclude '.git' \
+            --exclude 'frontend/node_modules' \
+            --exclude 'frontend/.vite' \
+            --exclude '__pycache__' \
+            --exclude '.venv' \
+            -e "ssh -i $HOME/.ssh/lightsail.pem -o StrictHostKeyChecking=accept-new" \
+            ./ "ubuntu@${INSTANCE_IP}:~/aurora/"
+
+      - name: Install remote .env (OpenRouter)
+        env:
+          INSTANCE_IP: ${{ steps.ensure_instance.outputs.instance_ip }}
+          OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+        run: |
+          if [ -n "$OPENROUTER_API_KEY" ]; then
+            printf 'OPENROUTER_API_KEY=%s\n' "$OPENROUTER_API_KEY" > .env.remote
+            scp -i ~/.ssh/lightsail.pem -o StrictHostKeyChecking=accept-new \
+              .env.remote "ubuntu@${INSTANCE_IP}:~/aurora/.env"
+            rm -f .env.remote
+          else
+            echo "OPENROUTER_API_KEY not set; skipping remote .env (set secret for production API)." >&2
+          fi
+
+      - name: Start app on instance (venv + uvicorn + nginx)
+        env:
+          INSTANCE_IP: ${{ steps.ensure_instance.outputs.instance_ip }}
+        run: |
+          chmod +x .github/scripts/lightsail-remote-deploy.sh
+          ssh -i ~/.ssh/lightsail.pem -o StrictHostKeyChecking=accept-new "ubuntu@${INSTANCE_IP}" \
+            'bash ~/aurora/.github/scripts/lightsail-remote-deploy.sh'
