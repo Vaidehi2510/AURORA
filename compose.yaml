@@ -1,0 +1,16 @@
+services:
+  aurora:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8501:8501"
+    environment:
+      OPENROUTER_API_KEY: ${OPENROUTER_API_KEY:-}
+      OPENROUTER_BASE_URL: ${OPENROUTER_BASE_URL:-}
+      OPENROUTER_SITE_URL: ${OPENROUTER_SITE_URL:-}
+      OPENROUTER_SITE_NAME: ${OPENROUTER_SITE_NAME:-AURORA}
+      AURORA_BOOTSTRAP_ENGINE: ${AURORA_BOOTSTRAP_ENGINE:-1}
+    volumes:
+      - ./db:/app/db
+      - ./artifacts:/app/artifacts
