@@ -15,6 +15,40 @@
   border-bottom: 1px solid var(--border);
   flex-shrink: 0;
 }
+.feedBtn {
+  margin-left: auto;
+  flex-shrink: 0;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+  padding: 4px 10px;
+  border-radius: 2px;
+  border: 1px solid var(--border);
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+.feedBtn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+.feedBtnPause {
+  background: color-mix(in srgb, var(--amber) 12%, transparent);
+  color: var(--amber);
+  border-color: color-mix(in srgb, var(--amber) 35%, transparent);
+}
+.feedBtnPause:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--amber) 22%, transparent);
+}
+.feedBtnStart {
+  background: color-mix(in srgb, var(--green) 14%, transparent);
+  color: var(--green);
+  border-color: color-mix(in srgb, var(--green) 40%, transparent);
+}
+.feedBtnStart:hover:not(:disabled) {
+  background: color-mix(in srgb, var(--green) 24%, transparent);
+}
 .dot {
   width: 6px;
   height: 6px;

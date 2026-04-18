@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useCallback } from 'react'
 import StatCards from './StatCards.jsx'
 import AlertsList from './AlertsList.jsx'
 import ExplainPanel from './ExplainPanel.jsx'
@@ -11,9 +11,17 @@ export default function DashboardView({ sentinel }) {
     alerts, ticker, stats,
     selectedAlertId, setSelectedAlertId,
     params, updateNote,
+    running, toggleFeed,
+    liveMode, liveFeedPaused, toggleLiveFeedPause,
+    liveApiAvailable,
   } = sentinel
 
   const selectedAlert = alerts.find(a => a.id === selectedAlertId) ?? null
+
+  const handleFeedToggle = useCallback(() => {
+    if (liveMode && liveApiAvailable) toggleLiveFeedPause()
+    else if (!liveMode) toggleFeed()
+  }, [liveMode, liveApiAvailable, toggleLiveFeedPause, toggleFeed])
 
   return (
     <div className={styles.view}>
@@ -41,7 +49,13 @@ export default function DashboardView({ sentinel }) {
           />
         </div>
         <div className={styles.sideFeed}>
-          <EventTicker events={ticker} />
+          <EventTicker
+            events={ticker}
+            feedActive={liveMode ? !liveFeedPaused : running}
+            onToggleFeed={handleFeedToggle}
+            feedToggleDisabled={liveMode && !liveApiAvailable}
+            liveMode={liveMode}
+          />
         </div>
       </div>
     </div>

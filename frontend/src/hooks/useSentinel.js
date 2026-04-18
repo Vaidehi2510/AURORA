@@ -24,6 +24,7 @@ export function useSentinel() {
   const [sources,         setSources]        = useState({ cyber: true, physical: true, osint: true, llm: true })
   const [totalIngested,   setTotalIngested]  = useState(0)
   const [liveMode,        setLiveMode]       = useState(false)
+  const [liveFeedPaused,  setLiveFeedPaused] = useState(false)
   const [liveError,       setLiveError]      = useState(null)
   const [engineRunning,   setEngineRunning]  = useState(false)
 
@@ -67,7 +68,11 @@ export function useSentinel() {
   }, [applySnapshot])
 
   useEffect(() => {
-    if (!auroraApiConfigured() || !liveMode) {
+    if (!liveMode) setLiveFeedPaused(false)
+  }, [liveMode])
+
+  useEffect(() => {
+    if (!auroraApiConfigured() || !liveMode || liveFeedPaused) {
       if (pollRef.current) {
         clearInterval(pollRef.current)
         pollRef.current = null
@@ -80,7 +85,7 @@ export function useSentinel() {
       if (pollRef.current) clearInterval(pollRef.current)
       pollRef.current = null
     }
-  }, [liveMode, pollOnce])
+  }, [liveMode, liveFeedPaused, pollOnce])
 
   // ── Ingest a single event ───────────────────────────────────
   const ingestEvent = useCallback((ev) => {
@@ -220,12 +225,18 @@ export function useSentinel() {
   const toggleLiveMode = useCallback(() => {
     if (!auroraApiConfigured()) return
     stopFeed()
+    setLiveFeedPaused(false)
     setLiveMode(m => {
       const next = !m
       if (!next) setLiveError(null)
       return next
     })
   }, [stopFeed])
+
+  const toggleLiveFeedPause = useCallback(() => {
+    if (!auroraApiConfigured() || !liveModeRef.current) return
+    setLiveFeedPaused(p => !p)
+  }, [])
 
   const refreshLive = useCallback(() => {
     if (liveModeRef.current) pollOnce()
@@ -264,9 +275,11 @@ export function useSentinel() {
     updateParam, toggleSource, updateNote,
     ingestEvent,
     liveMode,
+    liveFeedPaused,
     liveError,
     liveApiAvailable: auroraApiConfigured(),
     toggleLiveMode,
+    toggleLiveFeedPause,
     refreshLive,
     runBackendEngine,
     engineRunning,

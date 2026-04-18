@@ -6,7 +6,7 @@ __pycache__/
 .DS_Store
 
 # Env / secrets
-.env
+.env*
 *.env
 .venv/
 artifacts/**/*.sqlite

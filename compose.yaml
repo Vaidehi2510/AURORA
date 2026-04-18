@@ -30,3 +30,27 @@ services:
     volumes:
       - ./db:/app/db
       - ./artifacts:/app/artifacts
+    healthcheck:
+      test:
+        [
+          "CMD",
+          "python",
+          "-c",
+          "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/api/health')",
+        ]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+
+  aurora-web:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+      args:
+        VITE_AURORA_API: ${VITE_AURORA_API:-}
+    ports:
+      - "8080:80"
+    depends_on:
+      aurora-api:
+        condition: service_healthy
