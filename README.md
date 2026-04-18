@@ -69,13 +69,19 @@ Build the image:
 docker build -t aurora .
 ```
 
-Or use Docker Compose (Streamlit on **8501**, FastAPI on **8000**):
+Or use Docker Compose:
+
+- **Streamlit** on [http://127.0.0.1:8501](http://127.0.0.1:8501)
+- **FastAPI** on [http://127.0.0.1:8000](http://127.0.0.1:8000) (direct access, same as local `uvicorn`)
+- **React + nginx** (same-origin `/api` → API) on [http://127.0.0.1:8080](http://127.0.0.1:8080)
 
 ```bash
 docker compose up --build
 ```
 
 Compose reads variables from a root `.env` file for `${OPENROUTER_API_KEY}`, etc.
+
+The **`aurora-web`** service builds the Vite app and serves it behind nginx ([`docker/nginx/aurora.conf`](docker/nginx/aurora.conf)). Leave `VITE_AURORA_API` unset for that path so the browser keeps calling `/api/...` on port **8080**. To bake a separate API origin into the static build (for example a CDN-hosted UI talking to an API host), set `VITE_AURORA_API` when building (Compose `build.args` or `docker build --build-arg`).
 
 Run the Streamlit-only container with your local `.env`, `db/`, and `artifacts/`:
 
@@ -89,6 +95,12 @@ docker run --rm -it \
 ```
 
 Then open [http://localhost:8501](http://localhost:8501).
+
+### AWS Lightsail instance (us-east-1)
+
+The job **`deploy-lightsail`** in [`.github/workflows/cicd.yml`](.github/workflows/cicd.yml) runs after **python** and **frontend** succeed. It runs on **push to `main` or `master`** or when you **Run workflow** manually. It targets a Lightsail **VM instance** named **`Nat-Sec-Hackathon-Cyber-Dashboard`**. New instances use blueprint **`LIGHTSAIL_BLUEPRINT_ID`** (default **`ubuntu_24_04`**), bundle **`LIGHTSAIL_BUNDLE_ID`** (default **`nano_2_0`**), AZ **`us-east-1a`**, plus optional first-boot [`lightsail-instance-bootstrap.sh`](.github/scripts/lightsail-instance-bootstrap.sh). **User-data only runs on first boot**; the deploy script still runs **`apt`** on every deploy so Python **3.12+**, Node **20**, and **nginx** exist even on older VMs. Ubuntu **24.04** usually has **`python3`** at 3.12 but no **`python3.12`** binary — the scripts accept either. It opens TCP **22** and **80**, **rsync**s to **`~/aurora`**, writes **`OPENROUTER_API_KEY`** to **`~/aurora/.env`** when set, then runs [`lightsail-remote-deploy.sh`](.github/scripts/lightsail-remote-deploy.sh). Open **`http://<instance-public-ip>/`**. The deploy job **`timeout-minutes`** is **90** for long first-time **`apt`/`npm`**.
+
+Repository secrets: **`AWS_ACCESS_KEY_ID`**, **`AWS_SECRET_ACCESS_KEY`**, **`LIGHTSAIL_SSH_PRIVATE_KEY`** (PEM for the key attached to the instance), **`LIGHTSAIL_KEY_PAIR_NAME`** (must match the Lightsail key pair name; required the first time so AWS can create the instance), and **`OPENROUTER_API_KEY`** (recommended for the API). IAM needs Lightsail permissions for **get/list/create instance**, **get operation**, **open instance public ports**, and **get instance** in **us-east-1**. If **`nano_2_0`** is not valid in your account, change **`LIGHTSAIL_BUNDLE_ID`** in the workflow or pick a bundle from **`aws lightsail get-bundles`**.
 
 Notes:
 
