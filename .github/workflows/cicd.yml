@@ -5,7 +5,7 @@ name: CI
 #
 # Secrets: AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, LIGHTSAIL_SSH_PRIVATE_KEY (PEM for the instance key),
 #   LIGHTSAIL_KEY_PAIR_NAME (Lightsail key pair name — required when the workflow creates a new instance),
-#   OPENROUTER_API_KEY (optional but recommended for the API on the server).
+#   OPENROUTER_API_KEY and ELEVENLABS_API_KEY (optional but recommended for the API on the server).
 
 on:
   push:
@@ -179,18 +179,25 @@ jobs:
             -e "ssh -i $HOME/.ssh/lightsail.pem -o StrictHostKeyChecking=accept-new" \
             ./ "ubuntu@${INSTANCE_IP}:~/aurora/"
 
-      - name: Install remote .env (OpenRouter)
+      - name: Install remote .env (API secrets)
         env:
           INSTANCE_IP: ${{ steps.ensure_instance.outputs.instance_ip }}
           OPENROUTER_API_KEY: ${{ secrets.OPENROUTER_API_KEY }}
+          ELEVENLABS_API_KEY: ${{ secrets.ELEVENLABS_API_KEY }}
         run: |
-          if [ -n "$OPENROUTER_API_KEY" ]; then
-            printf 'OPENROUTER_API_KEY=%s\n' "$OPENROUTER_API_KEY" > .env.remote
+          if [ -n "$OPENROUTER_API_KEY" ] || [ -n "$ELEVENLABS_API_KEY" ]; then
+            : > .env.remote
+            if [ -n "$OPENROUTER_API_KEY" ]; then
+              printf 'OPENROUTER_API_KEY=%s\n' "$OPENROUTER_API_KEY" >> .env.remote
+            fi
+            if [ -n "$ELEVENLABS_API_KEY" ]; then
+              printf 'ELEVENLABS_API_KEY=%s\n' "$ELEVENLABS_API_KEY" >> .env.remote
+            fi
             scp -i ~/.ssh/lightsail.pem -o StrictHostKeyChecking=accept-new \
               .env.remote "ubuntu@${INSTANCE_IP}:~/aurora/.env"
             rm -f .env.remote
           else
-            echo "OPENROUTER_API_KEY not set; skipping remote .env (set secret for production API)." >&2
+            echo "OPENROUTER_API_KEY / ELEVENLABS_API_KEY not set; skipping remote .env (set secrets for production API)." >&2
           fi
 
       - name: Start app on instance (venv + uvicorn + nginx)
