@@ -1,7 +1,7 @@
 name: CI
 
 # Lightsail CD (VM instance): ensures instance "Nat-Sec-Hackathon-Cyber-Dashboard" exists in us-east-1,
-# rsyncs the repo, writes .env, runs docker compose. Not Lightsail Container Service.
+# rsyncs the repo, writes .env, runs native stack (venv + uvicorn + nginx) like local dev — not Docker on the VM.
 #
 # Secrets: AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, LIGHTSAIL_SSH_PRIVATE_KEY (PEM for the instance key),
 #   LIGHTSAIL_KEY_PAIR_NAME (Lightsail key pair name — required when the workflow creates a new instance),
@@ -79,7 +79,7 @@ jobs:
           tags: aurora-web:ci
 
   deploy-lightsail:
-    needs: [python, frontend, docker]
+    needs: [python, frontend]
     if: >-
       github.event_name == 'workflow_dispatch' ||
       (github.event_name == 'push' &&
@@ -134,7 +134,7 @@ jobs:
           echo "${{ secrets.LIGHTSAIL_SSH_PRIVATE_KEY }}" > ~/.ssh/lightsail.pem
           chmod 600 ~/.ssh/lightsail.pem
 
-      - name: Wait for SSH, cloud-init, and Docker
+      - name: Wait for SSH, cloud-init, and runtime stack
         env:
           INSTANCE_IP: ${{ steps.ensure_instance.outputs.instance_ip }}
         run: |
@@ -159,24 +159,24 @@ jobs:
           done
 
           echo "=== Phase 2: cloud-init (first-boot scripts) ==="
-          ssh $SSH_OPTS "$TARGET" 'sudo cloud-init status --wait' </dev/null || echo "cloud-init wait returned non-zero (continuing if Docker is up)"
+          ssh $SSH_OPTS "$TARGET" 'sudo cloud-init status --wait' </dev/null || echo "cloud-init wait returned non-zero (continuing)"
 
-          echo "=== Phase 3: Docker daemon ==="
+          echo "=== Phase 3: Python 3.12 + Node + nginx (first-boot packages) ==="
           for j in $(seq 1 90); do
-            if ssh $SSH_OPTS "$TARGET" 'sudo docker info' >/tmp/docker-test.log 2>&1; then
-              echo "Docker is ready (attempt $j)."
+            if ssh $SSH_OPTS "$TARGET" 'command -v python3.12 >/dev/null && command -v node >/dev/null && command -v nginx >/dev/null' >/tmp/ready-test.log 2>&1; then
+              echo "Runtime stack is ready (attempt $j)."
               exit 0
             fi
             if [ "$((j % 10))" -eq 0 ]; then
-              echo "--- docker check failed at $j; remote hint (if any): ---"
-              tail -20 /tmp/docker-test.log || true
+              echo "--- stack check failed at $j; remote hint (if any): ---"
+              tail -20 /tmp/ready-test.log || true
             fi
-            echo "Waiting for Docker (cloud-init may still be installing)... ($j/90)"
+            echo "Waiting for apt/cloud-init (python3.12, node, nginx)... ($j/90)"
             sleep 10
           done
-          echo "Timeout waiting for Docker. Remote output:" >&2
-          cat /tmp/docker-test.log >&2 || true
-          ssh $SSH_OPTS "$TARGET" 'sudo cloud-init status --long 2>/dev/null || true; tail -80 /var/log/cloud-init-output.log 2>/dev/null || true' >&2 || true
+          echo "Timeout waiting for first-boot packages. Remote output:" >&2
+          cat /tmp/ready-test.log >&2 || true
+          ssh $SSH_OPTS "$TARGET" 'sudo cloud-init status --long 2>/dev/null || true; tail -120 /var/log/cloud-init-output.log 2>/dev/null || true' >&2 || true
           exit 1
 
       - name: Rsync application to instance
@@ -206,9 +206,10 @@ jobs:
             echo "OPENROUTER_API_KEY not set; skipping remote .env (set secret for production API)." >&2
           fi
 
-      - name: Docker Compose up
+      - name: Start app on instance (venv + uvicorn + nginx)
         env:
           INSTANCE_IP: ${{ steps.ensure_instance.outputs.instance_ip }}
         run: |
+          chmod +x .github/scripts/lightsail-remote-deploy.sh
           ssh -i ~/.ssh/lightsail.pem -o StrictHostKeyChecking=accept-new "ubuntu@${INSTANCE_IP}" \
-            'cd ~/aurora && sudo docker compose up -d --build'
+            'bash ~/aurora/.github/scripts/lightsail-remote-deploy.sh'

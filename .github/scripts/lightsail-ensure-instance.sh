@@ -86,11 +86,9 @@ fi
 
 wait_instance_running
 
-# Firewall (idempotent: ignore failures if rules already exist)
+# Firewall: SSH + HTTP (nginx serves UI and proxies /api to localhost:8000)
 open_tcp 22
-open_tcp 8000
-open_tcp 8080
-open_tcp 8501
+open_tcp 80
 
 ip=$(wait_public_ip)
 echo "Public IP: $ip" >&2
