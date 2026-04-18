@@ -84,6 +84,46 @@
   word-break: break-all;
 }
 
+.statusGrid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.statusRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.statusGood,
+.statusBad {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.08em;
+}
+
+.statusGood {
+  color: var(--green);
+}
+
+.statusBad {
+  color: var(--red);
+}
+
+.metaStack {
+  margin-top: 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.metaLine {
+  font-size: 10px;
+  color: var(--text3);
+}
+
 /* Sliders */
 .sliderRow {
   margin-bottom: 14px;

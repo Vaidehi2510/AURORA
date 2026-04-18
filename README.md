@@ -25,6 +25,24 @@ Then open [http://127.0.0.1:5173](http://127.0.0.1:5173). The dev server proxies
 
 **First time:** copy `.env.example` to `.env` in the repo root and set `OPENROUTER_API_KEY` for analyst chat and LLM features. Restart uvicorn after editing `.env`.
 
+For voice input/output in analyst chat, also set `ELEVENLABS_API_KEY`. Optional voice settings are included in `.env.example`:
+
+```bash
+ELEVENLABS_API_KEY=...
+ELEVENLABS_VOICE_ID=JBFqnCBsd6RMkjVDRZzb
+ELEVENLABS_TTS_MODEL=eleven_flash_v2_5
+ELEVENLABS_STT_MODEL=scribe_v2
+```
+
+Voice demo flow:
+
+1. Start the backend and frontend.
+2. Open the React dashboard.
+3. In **Controls**, confirm **VOICE + AI STATUS** shows `READY`.
+4. Go to **Dashboard** and use `Mic` in the analyst chat panel.
+5. Speak a question about the selected alert, then press `Stop mic`.
+6. Review the cleaned transcript, press `Send`, and the reply can auto-play.
+
 **Live database in the UI:** open **Controls** → **Use live AURORA data** so the dashboard reads `db/aurora.db` via the API.
 
 ### Optional: Streamlit dashboard
