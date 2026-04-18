@@ -51,13 +51,19 @@ Build the image:
 docker build -t aurora .
 ```
 
-Or use Docker Compose (Streamlit on **8501**, FastAPI on **8000**):
+Or use Docker Compose:
+
+- **Streamlit** on [http://127.0.0.1:8501](http://127.0.0.1:8501)
+- **FastAPI** on [http://127.0.0.1:8000](http://127.0.0.1:8000) (direct access, same as local `uvicorn`)
+- **React + nginx** (same-origin `/api` → API) on [http://127.0.0.1:8080](http://127.0.0.1:8080)
 
 ```bash
 docker compose up --build
 ```
 
 Compose reads variables from a root `.env` file for `${OPENROUTER_API_KEY}`, etc.
+
+The **`aurora-web`** service builds the Vite app and serves it behind nginx ([`docker/nginx/aurora.conf`](docker/nginx/aurora.conf)). Leave `VITE_AURORA_API` unset for that path so the browser keeps calling `/api/...` on port **8080**. To bake a separate API origin into the static build (for example a CDN-hosted UI talking to an API host), set `VITE_AURORA_API` when building (Compose `build.args` or `docker build --build-arg`).
 
 Run the Streamlit-only container with your local `.env`, `db/`, and `artifacts/`:
 
@@ -71,6 +77,12 @@ docker run --rm -it \
 ```
 
 Then open [http://localhost:8501](http://localhost:8501).
+
+### AWS Lightsail instance (us-east-1)
+
+The job **`deploy-lightsail`** in [`.github/workflows/cicd.yml`](.github/workflows/cicd.yml) runs after **python**, **frontend**, and **docker** succeed, on **push to `main` or `master`** or when you **Run workflow** manually. It targets a Lightsail **VM instance** named **`Nat-Sec-Hackathon-Cyber-Dashboard`**. If that instance does not exist, the workflow creates it (Ubuntu 22.04, bundle from `LIGHTSAIL_BUNDLE_ID` in the workflow, default **`nano_2_0`**, AZ **`us-east-1a`**) using first-boot script [`lightsail-instance-bootstrap.sh`](.github/scripts/lightsail-instance-bootstrap.sh) to install Docker, opens TCP **22**, **8000**, **8080**, and **8501**, then **rsync**s the repo to `~/aurora` on the instance, copies **`OPENROUTER_API_KEY`** into **`~/aurora/.env`** when the secret is set, and runs **`sudo docker compose up -d --build`**.
+
+Repository secrets: **`AWS_ACCESS_KEY_ID`**, **`AWS_SECRET_ACCESS_KEY`**, **`LIGHTSAIL_SSH_PRIVATE_KEY`** (PEM for the key attached to the instance), **`LIGHTSAIL_KEY_PAIR_NAME`** (must match the Lightsail key pair name; required the first time so AWS can create the instance), and **`OPENROUTER_API_KEY`** (recommended for the API). IAM needs Lightsail permissions for **get/list/create instance**, **get operation**, **open instance public ports**, and **get instance** in **us-east-1**. If **`nano_2_0`** is not valid in your account, change **`LIGHTSAIL_BUNDLE_ID`** in the workflow or pick a bundle from **`aws lightsail get-bundles`**.
 
 Notes:
 

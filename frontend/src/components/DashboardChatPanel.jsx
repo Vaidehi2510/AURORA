@@ -1,10 +1,23 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react'
+import ReactMarkdown from 'react-markdown'
+import remarkGfm from 'remark-gfm'
 import {
   auroraApiConfigured,
   fetchAnalystChatStatus,
   postAnalystChat,
 } from '../api/auroraClient.js'
 import styles from './DashboardChatPanel.module.css'
+
+function MessageBody({ role, body }) {
+  if (role === 'assistant') {
+    return (
+      <div className={`${styles.msgBody} ${styles.msgMd}`}>
+        <ReactMarkdown remarkPlugins={[remarkGfm]}>{body}</ReactMarkdown>
+      </div>
+    )
+  }
+  return <div className={styles.msgBody}>{body}</div>
+}
 
 function nowTime() {
   return new Date().toLocaleTimeString('en-US', { hour12: false })
@@ -307,7 +320,7 @@ export default function DashboardChatPanel({
               </span>
               <span className={styles.msgTime}>{msg.time}</span>
             </div>
-            <div className={styles.msgBody}>{msg.body}</div>
+            <MessageBody role={msg.role} body={msg.body} />
           </div>
         ))}
       </div>
