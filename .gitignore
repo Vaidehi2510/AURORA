@@ -8,7 +8,7 @@ __pycache__/
 # Env / secrets
 .env
 *.env
-.vendor/
+.venv/
 artifacts/**/*.sqlite
 artifacts/**/*.json
 
