@@ -1,0 +1,13 @@
+Project Name: AURORA
+
+Goal:
+Build a cyber-physical correlation engine for critical infrastructure.
+
+Problem:
+Cyber alerts, physical incidents, and public reports are often tracked separately.
+
+Solution:
+Combine those signals in one system and alert a human when they may be related.
+
+Domain:
+Critical infrastructure / energy / power systems
