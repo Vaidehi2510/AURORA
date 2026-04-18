@@ -1,11 +1,10 @@
 import { explainConfidence } from './correlationEngine.js'
-
-const API_URL = 'https://api.anthropic.com/v1/messages'
-const MODEL   = 'claude-sonnet-4-20250514'
+import { auroraApiConfigured, postSynthesizeAlert } from '../api/auroraClient.js'
 
 /**
- * Call the Claude API to synthesize a human-readable alert
- * from a correlated cluster of events.
+ * Synthesize a human-readable alert from a correlated cluster of events.
+ * Uses the FastAPI + OpenRouter path when the dashboard API is configured (same-origin /api).
+ * Direct browser calls to Anthropic are not possible (CORS + key must stay server-side).
  *
  * Returns an AlertExplanation object:
  * {
@@ -40,26 +39,15 @@ Respond with ONLY a JSON object (no markdown, no preamble):
   "uncertainty": "one sentence about remaining unknowns"
 }`
 
-  try {
-    const res = await fetch(API_URL, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model: MODEL,
-        max_tokens: 400,
-        messages: [{ role: 'user', content: prompt }],
-      }),
-    })
-
-    if (!res.ok) throw new Error(`API ${res.status}`)
-
-    const data  = await res.json()
-    const text  = data.content?.find(b => b.type === 'text')?.text ?? '{}'
-    const clean = text.replace(/```json|```/g, '').trim()
-    return JSON.parse(clean)
-  } catch {
-    return fallbackSynthesize(incident, factors)
+  if (auroraApiConfigured()) {
+    try {
+      return await postSynthesizeAlert({ prompt })
+    } catch {
+      return fallbackSynthesize(incident, factors)
+    }
   }
+
+  return fallbackSynthesize(incident, factors)
 }
 
 // Rule-based fallback when the API is unavailable

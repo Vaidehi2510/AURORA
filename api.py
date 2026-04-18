@@ -331,6 +331,82 @@ def analyst_chat(body: AnalystChatRequest) -> dict[str, str]:
     return {"reply": reply}
 
 
+def _parse_llm_json_object(text: str) -> dict[str, Any] | None:
+    """Strip optional fences and extract the first JSON object from model output."""
+    clean = text.replace("```json", "").replace("```", "").strip()
+    try:
+        obj = json.loads(clean)
+        return obj if isinstance(obj, dict) else None
+    except json.JSONDecodeError:
+        pass
+    start = clean.find("{")
+    end = clean.rfind("}")
+    if start != -1 and end != -1 and end > start:
+        try:
+            obj = json.loads(clean[start : end + 1])
+            return obj if isinstance(obj, dict) else None
+        except json.JSONDecodeError:
+            return None
+    return None
+
+
+class SynthesizeAlertRequest(BaseModel):
+    prompt: str = Field(..., min_length=1, max_length=24_000)
+
+
+@app.post("/api/synthesize-alert")
+def synthesize_alert_card(body: SynthesizeAlertRequest) -> dict[str, str]:
+    """
+    Dashboard correlation cards: the React app used to call Anthropic from the browser (CORS-blocked).
+    This uses the same OpenRouter stack as analyst chat and the Python engine.
+    """
+    from openai_model import get_openrouter_client, openrouter_extra_headers, resolve_chat_model
+
+    client = get_openrouter_client()
+    model = resolve_chat_model(for_analyst_chat=False)
+    if client is None or not model:
+        raise HTTPException(
+            status_code=503,
+            detail="OpenRouter is not configured. Set OPENROUTER_API_KEY in the environment.",
+        )
+    system_msg = (
+        "Return a single JSON object only with keys: headline, summary, recommendation, uncertainty. "
+        "All values must be strings. No markdown fences or preamble."
+    )
+    try:
+        response = client.chat.completions.create(
+            model=model,
+            messages=[
+                {"role": "system", "content": system_msg},
+                {"role": "user", "content": body.prompt},
+            ],
+            extra_headers=openrouter_extra_headers(),
+            temperature=0.25,
+            max_tokens=600,
+        )
+        reply = (response.choices[0].message.content or "").strip()
+    except Exception as exc:
+        msg = str(exc)[:700]
+        raise HTTPException(status_code=502, detail=f"OpenRouter request failed: {msg}") from exc
+
+    if not reply:
+        raise HTTPException(status_code=502, detail="Empty model response")
+
+    parsed = _parse_llm_json_object(reply)
+    if not parsed:
+        raise HTTPException(status_code=502, detail="Model did not return valid JSON")
+
+    out = {
+        "headline": str(parsed.get("headline", "")).strip(),
+        "summary": str(parsed.get("summary", "")).strip(),
+        "recommendation": str(parsed.get("recommendation", "")).strip(),
+        "uncertainty": str(parsed.get("uncertainty", "")).strip(),
+    }
+    if not out["headline"]:
+        raise HTTPException(status_code=502, detail="JSON missing headline")
+    return out
+
+
 @app.get("/api/voice/status")
 def api_voice_status() -> dict[str, Any]:
     return voice_status()

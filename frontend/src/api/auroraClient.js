@@ -53,6 +53,30 @@ export async function runEngineOnServer() {
   return res.json()
 }
 
+/**
+ * Server-side OpenRouter synthesis for correlated alert cards (avoids browser → Anthropic CORS).
+ * @param {{ prompt: string }} payload
+ * @returns {Promise<{ headline: string, summary: string, recommendation: string, uncertainty: string }>}
+ */
+export async function postSynthesizeAlert(payload) {
+  const res = await fetch(apiUrl('/api/synthesize-alert'), {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  })
+  if (!res.ok) {
+    let detail = `Alert synthesis failed (${res.status})`
+    try {
+      const j = await res.json()
+      if (j?.detail) detail = typeof j.detail === 'string' ? j.detail : JSON.stringify(j.detail)
+    } catch {
+      /* ignore */
+    }
+    throw new Error(detail)
+  }
+  return res.json()
+}
+
 /** @returns {Promise<{ configured: boolean, model: string }>} */
 export async function fetchAnalystChatStatus() {
   const res = await fetch(apiUrl('/api/analyst-chat/status'))
