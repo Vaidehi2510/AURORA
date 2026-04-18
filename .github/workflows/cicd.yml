@@ -91,6 +91,9 @@ jobs:
       AWS_REGION: us-east-1
       LIGHTSAIL_INSTANCE_NAME: Nat-Sec-Hackathon-Cyber-Dashboard
       LIGHTSAIL_BUNDLE_ID: nano_2_0
+      # Match Lightsail OS (Noble = 24.04 uses stock python3 as 3.12; Jammy needs deadsnakes — handled in scripts).
+      LIGHTSAIL_BLUEPRINT_ID: ubuntu_24_04
+    timeout-minutes: 90
 
     steps:
       - uses: actions/checkout@v4
@@ -123,7 +126,7 @@ jobs:
             "$LIGHTSAIL_INSTANCE_NAME" \
             "${{ secrets.LIGHTSAIL_KEY_PAIR_NAME }}" \
             "$LIGHTSAIL_BUNDLE_ID" \
-            "ubuntu_22_04" \
+            "$LIGHTSAIL_BLUEPRINT_ID" \
             "us-east-1a" \
             "$BOOT")
           echo "instance_ip=$IP" >> "$GITHUB_OUTPUT"
@@ -158,26 +161,12 @@ jobs:
             sleep 5
           done
 
-          echo "=== Phase 2: cloud-init (first-boot scripts) ==="
+          echo "=== Phase 2: cloud-init (first boot only; safe on existing instances) ==="
           ssh $SSH_OPTS "$TARGET" 'sudo cloud-init status --wait' </dev/null || echo "cloud-init wait returned non-zero (continuing)"
 
-          echo "=== Phase 3: Python 3.12 + Node + nginx (first-boot packages) ==="
-          for j in $(seq 1 90); do
-            if ssh $SSH_OPTS "$TARGET" 'command -v python3.12 >/dev/null && command -v node >/dev/null && command -v nginx >/dev/null' >/tmp/ready-test.log 2>&1; then
-              echo "Runtime stack is ready (attempt $j)."
-              exit 0
-            fi
-            if [ "$((j % 10))" -eq 0 ]; then
-              echo "--- stack check failed at $j; remote hint (if any): ---"
-              tail -20 /tmp/ready-test.log || true
-            fi
-            echo "Waiting for apt/cloud-init (python3.12, node, nginx)... ($j/90)"
-            sleep 10
-          done
-          echo "Timeout waiting for first-boot packages. Remote output:" >&2
-          cat /tmp/ready-test.log >&2 || true
-          ssh $SSH_OPTS "$TARGET" 'sudo cloud-init status --long 2>/dev/null || true; tail -120 /var/log/cloud-init-output.log 2>/dev/null || true' >&2 || true
-          exit 1
+          echo "=== Phase 3: runtime stack ==="
+          echo "Skipping long wait for python/node/nginx: existing VMs often have no user-data, and Ubuntu 24.04 exposes python3 (3.12) not python3.12."
+          echo "The deploy step installs anything missing via apt (may take several minutes on first run)."
 
       - name: Rsync application to instance
         env:

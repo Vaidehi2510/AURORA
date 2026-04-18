@@ -5,7 +5,7 @@ REGION="${1:?region}"
 NAME="${2:?instance-name}"
 KEY_PAIR="${3:-}"
 BUNDLE="${4:-nano_2_0}"
-BLUEPRINT="${5:-ubuntu_22_04}"
+BLUEPRINT="${5:-ubuntu_24_04}"
 AZ="${6:-us-east-1a}"
 BOOTSTRAP="${7:?path-to-bootstrap-script}"
 
