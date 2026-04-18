@@ -1,276 +1,298 @@
 from __future__ import annotations
 
 import json
-import re
+import os
+import time
 from typing import Any
+
 from openai_model import get_openrouter_client, openrouter_extra_headers
 
-ANALYST_MODEL = "meta-llama/llama-4-scout"
+# ============================================================
+# MODEL CONFIG
+# ============================================================
+
+PRIMARY_MODEL = "meta-llama/llama-3.3-70b-instruct:free"
+DEV_FALLBACK_MODEL = "nvidia/nemotron-3-super-120b-a12b:free"
+
+# Modes:
+# - meta_strict: only Llama 3.3
+# - meta_with_retry: only Llama 3.3, with retries
+# - resilient_dev: Llama 3.3 first, then Nemotron fallback
+ANALYST_MODE = os.getenv("AURORA_ANALYST_MODE", "meta_with_retry")
+
+# ============================================================
+# SYSTEM PROMPT
+# ============================================================
 
 SYSTEM_PROMPT = """You are AURORA's Senior Intelligence Analyst — a seasoned cyber-physical threat analyst with 20 years of experience at NSA, CISA, and DHS.
 
-Your job is to receive a correlated alert from AURORA's detection engine and produce a FINISHED INTELLIGENCE PRODUCT — the kind a duty officer would read before deciding whether to escalate to an incident response team.
+AURORA is NOT a SIEM. It sits above cyber tools, physical security systems, and OSINT sources to determine whether correlated multi-domain activity is likely real, benign, a false positive, or still inconclusive.
 
-You are skeptical, rigorous, and precise. You challenge weak correlations. You cite specific evidence. You never speculate beyond what the data supports.
+Your job is to receive a correlated alert from AURORA's detection engine and produce a finished SOC-friendly operational assessment that a duty officer, SOC lead, or incident response lead could read immediately.
 
-Your output must follow this exact JSON structure:
-{
-  "analyst_verdict": "CONFIRMED THREAT | PROBABLE THREAT | POSSIBLE THREAT | LIKELY BENIGN | INSUFFICIENT DATA",
-  "confidence_assessment": {
-    "score": 0-100,
-    "rationale": "2-3 sentences explaining exactly why this score"
-  },
-  "threat_narrative": "3-4 sentence plain-English story of what likely happened in chronological order",
-  "evidence_evaluation": [
-    {
-      "event": "event description",
-      "credibility": "HIGH | MEDIUM | LOW",
-      "reasoning": "one sentence"
-    }
-  ],
-  "historical_precedent": {
-    "best_match": "name of closest historical incident",
-    "similarity": "what matches and what differs",
-    "outcome": "what happened in that historical case"
-  },
-  "critical_gaps": ["what is missing that would confirm or deny this threat"],
-  "recommended_actions": [
-    {
-      "priority": "IMMEDIATE | WITHIN_1HR | WITHIN_24HR",
-      "action": "specific actionable step",
-      "owner": "who should do this"
-    }
-  ],
-  "escalate": true or false,
-  "escalation_rationale": "one sentence why escalate or why not"
-}
+You are skeptical, rigorous, conservative, and precise.
+You challenge weak correlations.
+You do not overstate certainty.
+You do not speculate beyond the evidence.
 
-Return strict JSON only. No markdown. No backticks. No preamble."""
+Write in plain operational English.
 
+Your response must use this exact structure:
 
-def _clean_json(raw: str) -> str:
-    cleaned = raw.strip()
-    cleaned = re.sub(r"^```json\s*", "", cleaned)
-    cleaned = re.sub(r"^```\s*", "", cleaned)
-    cleaned = re.sub(r"```\s*$", "", cleaned).strip()
-    return cleaned
+AURORA ASSESSMENT: one of the following
+- True Positive
+- False Positive
+- Benign / Non-Threat
+- Inconclusive
 
+Escalation Recommendation: one of the following
+- Escalate to IR
+- Monitor Locally
+- No Escalation
 
-def _parse_response(raw: str) -> dict | None:
-    cleaned = _clean_json(raw)
-    try:
-        return json.loads(cleaned)
-    except json.JSONDecodeError:
-        start = cleaned.find("{")
-        end = cleaned.rfind("}")
-        if start != -1 and end != -1 and end > start:
-            try:
-                return json.loads(cleaned[start:end + 1])
-            except json.JSONDecodeError:
-                pass
-    return None
+Confidence: X/100
 
+What happened:
+2-4 sentences explaining what likely happened, in chronological order if possible.
 
-class SeniorAnalystAgent:
-    def __init__(self) -> None:
-        self.client = get_openrouter_client()
-        self.model = ANALYST_MODEL
+Why AURORA thinks this:
+2-3 sentences explaining why the cyber, physical, and/or OSINT signals appear related or not related.
 
-    def analyze(self, alert: dict[str, Any]) -> dict[str, Any] | None:
-        if self.client is None:
-            print("No OpenRouter client — check OPENROUTER_API_KEY in .env")
-            return None
+Operational gaps identified:
+- 2 to 4 bullet points listing what is still missing, uncertain, or required to validate the assessment
 
-        alert_summary = {
-            "headline": alert.get("headline", ""),
-            "priority": alert.get("priority", ""),
-            "confidence": alert.get("confidence", 0),
-            "location": alert.get("location", ""),
-            "time_window_start": alert.get("time_window_start", ""),
-            "time_window_end": alert.get("time_window_end", ""),
-            "why_it_matters": alert.get("why_it_matters", []),
-            "evidence": alert.get("evidence", [])[:8],
-            "supporting_priors": alert.get("supporting_priors", [])[:4],
-            "top_edges": alert.get("top_edges", [])[:5],
-            "cluster_metrics": alert.get("cluster_metrics", {}),
-        }
+Recommended next actions:
+1. first action
+2. second action
+3. third action
 
-        prompt = (
-            "The AURORA cyber-physical correlation engine has fired the following alert. "
-            "Perform your senior analyst review and return your finished intelligence assessment.\n\n"
-            "AURORA ALERT:\n"
-            + json.dumps(alert_summary, indent=2, default=str)
-        )
+Rules:
+- Be conservative.
+- Use "True Positive" only when the evidence strongly supports a real coordinated malicious event.
+- Use "False Positive" when the system correlated events that do not actually support a real coordinated threat.
+- Use "Benign / Non-Threat" when the activity appears routine, harmless, or operationally normal.
+- Use "Inconclusive" when the evidence is insufficient to make a confident judgment.
+- "Escalate to IR" should be used only when the event likely requires incident response engagement.
+- "Monitor Locally" should be used when the event needs validation or watchful follow-up but not full IR escalation yet.
+- "No Escalation" should be used when the event appears benign or false positive.
+- Do not use JSON.
+- Do not use markdown code fences.
+- Do not mention model names.
+- Do not mention fallback logic or prior model failures.
+"""
 
-        try:
-            response = self.client.chat.completions.create(
-                model=self.model,
-                messages=[
-                    {"role": "system", "content": SYSTEM_PROMPT},
-                    {"role": "user", "content": prompt},
-                ],
-                extra_headers=openrouter_extra_headers(),
-                temperature=0.1,
-            )
-            raw = response.choices[0].message.content or ""
-            result = _parse_response(raw)
-            if result is None:
-                print("JSON parse failed. Raw output:\n" + raw[:500])
-            return result
-        except Exception as e:
-            print("Analyst agent error: " + str(e))
-            return None
+# ============================================================
+# MODEL ROUTING
+# ============================================================
 
-    def analyze_with_vision(
-        self,
-        alert: dict[str, Any],
-        frame_path: str | None = None,
-    ) -> dict[str, Any] | None:
-        if self.client is None:
-            print("No OpenRouter client — check OPENROUTER_API_KEY in .env")
-            return None
+def get_model_sequence() -> list[str]:
+    if ANALYST_MODE == "meta_strict":
+        return [PRIMARY_MODEL]
 
-        alert_summary = {
-            "headline": alert.get("headline", ""),
-            "priority": alert.get("priority", ""),
-            "confidence": alert.get("confidence", 0),
-            "location": alert.get("location", ""),
-            "evidence": alert.get("evidence", [])[:8],
-            "supporting_priors": alert.get("supporting_priors", [])[:4],
-        }
+    if ANALYST_MODE == "meta_with_retry":
+        return [PRIMARY_MODEL]
 
-        messages: list[dict[str, Any]] = [
-            {"role": "system", "content": SYSTEM_PROMPT}
+    if ANALYST_MODE == "resilient_dev":
+        return [
+            PRIMARY_MODEL,
+            DEV_FALLBACK_MODEL,
         ]
 
-        if frame_path:
-            import base64
+    return [PRIMARY_MODEL]
+
+
+def call_analyst_model(messages: list[dict[str, str]], max_tokens: int = 1200) -> dict[str, Any]:
+    client = get_openrouter_client()
+    models = get_model_sequence()
+
+    last_error = None
+
+    headers = openrouter_extra_headers()
+    if headers is None:
+        headers = {}
+
+    for model in models:
+        # PRIMARY_MODEL gets 3 total attempts: first + 2 retries
+        retry_delays = [0, 2, 5] if model == PRIMARY_MODEL else [0]
+
+        for delay in retry_delays:
+            if delay > 0:
+                time.sleep(delay)
+
             try:
-                with open(frame_path, "rb") as f:
-                    b64 = base64.b64encode(f.read()).decode()
-                messages.append({
-                    "role": "user",
-                    "content": [
-                        {
-                            "type": "image_url",
-                            "image_url": {
-                                "url": "data:image/jpeg;base64," + b64
-                            }
-                        },
-                        {
-                            "type": "text",
-                            "text": (
-                                "This is the camera frame that triggered AURORA's physical anomaly detection. "
-                                "DINOv2 flagged this frame as anomalous and SAM segmented the object of interest. "
-                                "Analyze what you see in the image, then review the full AURORA alert below "
-                                "and produce your senior analyst assessment.\n\n"
-                                "AURORA ALERT:\n"
-                                + json.dumps(alert_summary, indent=2, default=str)
-                            )
-                        }
-                    ]
-                })
-            except Exception as e:
-                print("Could not load frame: " + str(e))
-                messages.append({
-                    "role": "user",
-                    "content": (
-                        "AURORA ALERT:\n"
-                        + json.dumps(alert_summary, indent=2, default=str)
-                    )
-                })
-        else:
-            messages.append({
-                "role": "user",
-                "content": (
-                    "AURORA ALERT:\n"
-                    + json.dumps(alert_summary, indent=2, default=str)
+                response = client.chat.completions.create(
+                    model=model,
+                    messages=messages,
+                    temperature=0.2,
+                    max_tokens=max_tokens,
+                    extra_headers=headers,
                 )
-            })
 
+                if response is None:
+                    raise RuntimeError(f"Model {model} returned None response")
+
+                if not hasattr(response, "choices") or response.choices is None or len(response.choices) == 0:
+                    raise RuntimeError(f"Model {model} returned no choices")
+
+                message = response.choices[0].message
+                if message is None:
+                    raise RuntimeError(f"Model {model} returned empty message object")
+
+                content = getattr(message, "content", None)
+                if content is None or not str(content).strip():
+                    raise RuntimeError(f"Model {model} returned empty content")
+
+                return {
+                    "model_used": model,
+                    "content": str(content).strip(),
+                }
+
+            except Exception as e:
+                last_error = e
+                err = str(e)
+
+                # Retry only rate limits on primary Meta model
+                if model == PRIMARY_MODEL and "429" in err:
+                    continue
+
+                # Skip unavailable endpoints
+                if "404" in err or "No endpoints found" in err:
+                    break
+
+                # Any other failure: move to next model
+                break
+
+    raise RuntimeError(f"AURORA analyst model failed. Last error: {last_error}")
+
+# ============================================================
+# RULE-BASED ASSESSMENT + ESCALATION GROUNDING
+# ============================================================
+
+def derive_system_assessment(alert_payload: dict[str, Any]) -> tuple[str, str, int]:
+    cluster_conf = int(alert_payload.get("confidence_score", 0))
+    evidence = alert_payload.get("supporting_evidence", [])
+    summary = str(alert_payload.get("summary", "")).lower()
+    why_connected = str(alert_payload.get("why_connected", "")).lower()
+
+    text = f"{summary} {why_connected}"
+
+    has_cyber = "cyber" in text
+    has_physical = "physical" in text
+    has_osint = "osint" in text
+
+    strong_evidence_count = 0
+    for ev in evidence:
         try:
-            response = self.client.chat.completions.create(
-                model=self.model,
-                messages=messages,
-                extra_headers=openrouter_extra_headers(),
-                temperature=0.1,
-            )
-            raw = response.choices[0].message.content or ""
-            result = _parse_response(raw)
-            if result is None:
-                print("Vision JSON parse failed. Raw output:\n" + raw[:500])
-            return result
-        except Exception as e:
-            print("Vision analyst error: " + str(e))
-            return None
+            score = int(ev.get("match_score", 0))
+        except Exception:
+            score = 0
 
-    def analyze_with_vision_and_bbox(
-        self,
-        alert: dict[str, Any],
-        frame_path: str,
-        bbox: list[int],
-    ) -> dict[str, Any] | None:
-        from PIL import Image, ImageDraw
-        import base64, io
+        reason = str(ev.get("reason_for_match", "")).lower()
+        source = str(ev.get("source", "")).lower()
 
-        try:
-            img = Image.open(frame_path).convert("RGB")
-            draw = ImageDraw.Draw(img)
-            x1, y1, x2, y2 = bbox
-            draw.rectangle([x1, y1, x2, y2], outline=(255, 0, 0), width=3)
-            buf = io.BytesIO()
-            img.save(buf, format="JPEG")
-            b64 = base64.b64encode(buf.getvalue()).decode()
-        except Exception as e:
-            print("Could not annotate frame: " + str(e))
-            return self.analyze(alert)
+        if score >= 8:
+            strong_evidence_count += 1
+        elif "same infrastructure type" in reason:
+            strong_evidence_count += 1
+        elif "keyword overlap" in reason and source in {"cisa_ics", "aiid", "gdelt", "cisa_kev"}:
+            strong_evidence_count += 1
 
-        alert_summary = {
-            "headline": alert.get("headline", ""),
-            "priority": alert.get("priority", ""),
-            "confidence": alert.get("confidence", 0),
-            "location": alert.get("location", ""),
-            "evidence": alert.get("evidence", [])[:8],
-            "supporting_priors": alert.get("supporting_priors", [])[:4],
-        }
+    # Assessment logic
+    if cluster_conf >= 80 and has_cyber and has_physical and strong_evidence_count >= 2:
+        assessment = "True Positive"
+        escalation = "Escalate to IR"
+    elif cluster_conf >= 65 and (has_cyber and has_physical or has_cyber and has_osint or has_physical and has_osint) and strong_evidence_count >= 1:
+        assessment = "Inconclusive"
+        escalation = "Monitor Locally"
+    elif cluster_conf < 45 and strong_evidence_count == 0:
+        assessment = "Benign / Non-Threat"
+        escalation = "No Escalation"
+    elif cluster_conf < 55 and strong_evidence_count <= 1:
+        assessment = "False Positive"
+        escalation = "No Escalation"
+    else:
+        assessment = "Inconclusive"
+        escalation = "Monitor Locally"
 
-        messages = [
-            {"role": "system", "content": SYSTEM_PROMPT},
+    return assessment, escalation, cluster_conf
+
+# ============================================================
+# PROMPT BUILDER
+# ============================================================
+
+def build_user_prompt(alert_payload: dict[str, Any]) -> str:
+    system_assessment, system_escalation, system_confidence = derive_system_assessment(alert_payload)
+
+    return f"""
+Analyze the following correlated AURORA alert and produce a final SOC-style operational assessment.
+
+System-grounded assessment: {system_assessment}
+System-grounded escalation recommendation: {system_escalation}
+System confidence score: {system_confidence}/100
+
+Use these system-grounded values as strong anchors unless the alert payload clearly contradicts them. Be conservative and avoid overstating certainty.
+
+ALERT INPUT:
+{json.dumps(alert_payload, indent=2)}
+""".strip()
+
+# ============================================================
+# MAIN ANALYST ENTRYPOINT
+# ============================================================
+
+def run_senior_analyst(alert_payload: dict[str, Any], max_tokens: int = 1200) -> dict[str, Any]:
+    user_prompt = build_user_prompt(alert_payload)
+
+    messages = [
+        {"role": "system", "content": SYSTEM_PROMPT},
+        {"role": "user", "content": user_prompt},
+    ]
+
+    result = call_analyst_model(messages, max_tokens=max_tokens)
+
+    return {
+        "analysis_text": result["content"].strip(),
+        "_meta": {
+            "model_used": result["model_used"],
+            "analyst_mode": ANALYST_MODE,
+        },
+    }
+
+# ============================================================
+# OPTIONAL TEST RUNNER
+# ============================================================
+
+if __name__ == "__main__":
+    sample_alert_payload = {
+        "alert_id": "ALERT-TEST-001",
+        "cluster_event_ids": ["SIM1", "SIM2", "SIM3", "SIM4"],
+        "facility": "substation_alpha",
+        "city": "Washington",
+        "country": "US",
+        "timestamp_window": "2026-04-18T14:30:00 to 2026-04-18T14:39:00",
+        "confidence_score": 82,
+        "summary": "AURORA detected multi-domain activity involving cyber, physical, and osint signals at substation_alpha.",
+        "why_connected": "Events occurred within the same operational window and share location context. The cluster includes port scanning, authentication failure, badge anomaly, and outage reporting activity.",
+        "recommended_action": "Escalate to analyst review, validate cyber and physical telemetry, and assess whether critical infrastructure operations require protective action.",
+        "supporting_evidence": [
             {
-                "role": "user",
-                "content": [
-                    {
-                        "type": "image_url",
-                        "image_url": {"url": "data:image/jpeg;base64," + b64}
-                    },
-                    {
-                        "type": "text",
-                        "text": (
-                            "This camera frame was captured at " + alert.get("location", "the facility") + ". "
-                            "The RED BOUNDING BOX was drawn by Meta SAM after DINOv2 detected an anomaly. "
-                            "This is the object that triggered AURORA's physical domain alert. "
-                            "Analyze what you see inside the red box, assess the threat, "
-                            "then review the full correlated alert and produce your intelligence assessment.\n\n"
-                            "AURORA ALERT:\n"
-                            + json.dumps(alert_summary, indent=2, default=str)
-                        )
-                    }
-                ]
+                "event_id": "4654",
+                "source": "CISA_ICS",
+                "title": "Schneider Electric SCADAPack and RemoteConnect",
+                "description": "SCADAPack 57x All Versions, RemoteConnect Versions prior to R3.4.2",
+                "reason_for_match": "keyword overlap",
+                "match_score": 10
+            },
+            {
+                "event_id": "ICS-8",
+                "source": "CISA_ICS",
+                "title": "Substation automation exploit",
+                "description": "Attackers can interfere with substation control systems",
+                "reason_for_match": "same infrastructure type, keyword overlap",
+                "match_score": 9
             }
         ]
+    }
 
-        try:
-            response = self.client.chat.completions.create(
-                model=self.model,
-                messages=messages,
-                extra_headers=openrouter_extra_headers(),
-                temperature=0.1,
-            )
-            raw = response.choices[0].message.content or ""
-            result = _parse_response(raw)
-            if result is None:
-                print("BBox vision parse failed. Raw:\n" + raw[:500])
-            return result
-        except Exception as e:
-            print("BBox vision analyst error: " + str(e))
-            return None
+    result = run_senior_analyst(sample_alert_payload)
+    print(result["analysis_text"])
