@@ -1,0 +1,1182 @@
+[
+  {
+    "frame_index": 0,
+    "frame_path": "demo_frames/normal/frame_0000.jpg",
+    "frame_type": "normal",
+    "event": null
+  },
+  {
+    "frame_index": 1,
+    "frame_path": "demo_frames/normal/frame_0001.jpg",
+    "frame_type": "normal",
+    "event": null
+  },
+  {
+    "frame_index": 2,
+    "frame_path": "demo_frames/normal/frame_0002.jpg",
+    "frame_type": "normal",
+    "event": null
+  },
+  {
+    "frame_index": 3,
+    "frame_path": "demo_frames/normal/frame_0003.jpg",
+    "frame_type": "normal",
+    "event": null
+  },
+  {
+    "frame_index": 4,
+    "frame_path": "demo_frames/normal/frame_0004.jpg",
+    "frame_type": "normal",
+    "event": null
+  },
+  {
+    "frame_index": 5,
+    "frame_path": "demo_frames/normal/frame_0005.jpg",
+    "frame_type": "normal",
+    "event": null
+  },
+  {
+    "frame_index": 6,
+    "frame_path": "demo_frames/normal/frame_0006.jpg",
+    "frame_type": "normal",
+    "event": null
+  },
+  {
+    "frame_index": 7,
+    "frame_path": "demo_frames/normal/frame_0007.jpg",
+    "frame_type": "normal",
+    "event": null
+  },
+  {
+    "frame_index": 8,
+    "frame_path": "demo_frames/normal/frame_0008.jpg",
+    "frame_type": "normal",
+    "event": null
+  },
+  {
+    "frame_index": 9,
+    "frame_path": "demo_frames/normal/frame_0009.jpg",
+    "frame_type": "normal",
+    "event": null
+  },
+  {
+    "frame_index": 10,
+    "frame_path": "demo_frames/normal/frame_0010.jpg",
+    "frame_type": "normal",
+    "event": null
+  },
+  {
+    "frame_index": 11,
+    "frame_path": "demo_frames/normal/frame_0011.jpg",
+    "frame_type": "normal",
+    "event": null
+  },
+  {
+    "frame_index": 12,
+    "frame_path": "demo_frames/normal/frame_0012.jpg",
+    "frame_type": "normal",
+    "event": null
+  },
+  {
+    "frame_index": 13,
+    "frame_path": "demo_frames/normal/frame_0013.jpg",
+    "frame_type": "normal",
+    "event": null
+  },
+  {
+    "frame_index": 14,
+    "frame_path": "demo_frames/normal/frame_0014.jpg",
+    "frame_type": "normal",
+    "event": null
+  },
+  {
+    "frame_index": 15,
+    "frame_path": "demo_frames/normal/frame_0015.jpg",
+    "frame_type": "normal",
+    "event": null
+  },
+  {
+    "frame_index": 16,
+    "frame_path": "demo_frames/normal/frame_0016.jpg",
+    "frame_type": "normal",
+    "event": null
+  },
+  {
+    "frame_index": 17,
+    "frame_path": "demo_frames/normal/frame_0017.jpg",
+    "frame_type": "normal",
+    "event": null
+  },
+  {
+    "frame_index": 18,
+    "frame_path": "demo_frames/normal/frame_0018.jpg",
+    "frame_type": "normal",
+    "event": null
+  },
+  {
+    "frame_index": 19,
+    "frame_path": "demo_frames/normal/frame_0019.jpg",
+    "frame_type": "normal",
+    "event": null
+  },
+  {
+    "frame_index": 20,
+    "frame_path": "demo_frames/normal/frame_0020.jpg",
+    "frame_type": "normal",
+    "event": null
+  },
+  {
+    "frame_index": 21,
+    "frame_path": "demo_frames/normal/frame_0021.jpg",
+    "frame_type": "normal",
+    "event": null
+  },
+  {
+    "frame_index": 22,
+    "frame_path": "demo_frames/normal/frame_0022.jpg",
+    "frame_type": "normal",
+    "event": null
+  },
+  {
+    "frame_index": 23,
+    "frame_path": "demo_frames/normal/frame_0023.jpg",
+    "frame_type": "normal",
+    "event": null
+  },
+  {
+    "frame_index": 24,
+    "frame_path": "demo_frames/normal/frame_0024.jpg",
+    "frame_type": "normal",
+    "event": null
+  },
+  {
+    "frame_index": 25,
+    "frame_path": "demo_frames/normal/frame_0025.jpg",
+    "frame_type": "normal",
+    "event": null
+  },
+  {
+    "frame_index": 26,
+    "frame_path": "demo_frames/normal/frame_0026.jpg",
+    "frame_type": "normal",
+    "event": null
+  },
+  {
+    "frame_index": 27,
+    "frame_path": "demo_frames/normal/frame_0027.jpg",
+    "frame_type": "normal",
+    "event": null
+  },
+  {
+    "frame_index": 28,
+    "frame_path": "demo_frames/normal/frame_0028.jpg",
+    "frame_type": "normal",
+    "event": null
+  },
+  {
+    "frame_index": 29,
+    "frame_path": "demo_frames/normal/frame_0029.jpg",
+    "frame_type": "normal",
+    "event": null
+  },
+  {
+    "frame_index": 30,
+    "frame_path": "demo_frames/normal/frame_0030.jpg",
+    "frame_type": "normal",
+    "event": null
+  },
+  {
+    "frame_index": 31,
+    "frame_path": "demo_frames/normal/frame_0031.jpg",
+    "frame_type": "normal",
+    "event": null
+  },
+  {
+    "frame_index": 32,
+    "frame_path": "demo_frames/normal/frame_0032.jpg",
+    "frame_type": "normal",
+    "event": null
+  },
+  {
+    "frame_index": 33,
+    "frame_path": "demo_frames/normal/frame_0033.jpg",
+    "frame_type": "normal",
+    "event": null
+  },
+  {
+    "frame_index": 34,
+    "frame_path": "demo_frames/normal/frame_0034.jpg",
+    "frame_type": "normal",
+    "event": null
+  },
+  {
+    "frame_index": 35,
+    "frame_path": "demo_frames/normal/frame_0035.jpg",
+    "frame_type": "normal",
+    "event": null
+  },
+  {
+    "frame_index": 36,
+    "frame_path": "demo_frames/normal/frame_0036.jpg",
+    "frame_type": "normal",
+    "event": null
+  },
+  {
+    "frame_index": 37,
+    "frame_path": "demo_frames/normal/frame_0037.jpg",
+    "frame_type": "normal",
+    "event": null
+  },
+  {
+    "frame_index": 38,
+    "frame_path": "demo_frames/normal/frame_0038.jpg",
+    "frame_type": "normal",
+    "event": null
+  },
+  {
+    "frame_index": 39,
+    "frame_path": "demo_frames/normal/frame_0039.jpg",
+    "frame_type": "normal",
+    "event": null
+  },
+  {
+    "frame_index": 40,
+    "frame_path": "demo_frames/normal/frame_0040.jpg",
+    "frame_type": "normal",
+    "event": null
+  },
+  {
+    "frame_index": 41,
+    "frame_path": "demo_frames/normal/frame_0041.jpg",
+    "frame_type": "normal",
+    "event": null
+  },
+  {
+    "frame_index": 42,
+    "frame_path": "demo_frames/normal/frame_0042.jpg",
+    "frame_type": "normal",
+    "event": null
+  },
+  {
+    "frame_index": 43,
+    "frame_path": "demo_frames/normal/frame_0043.jpg",
+    "frame_type": "normal",
+    "event": null
+  },
+  {
+    "frame_index": 44,
+    "frame_path": "demo_frames/normal/frame_0044.jpg",
+    "frame_type": "normal",
+    "event": null
+  },
+  {
+    "frame_index": 45,
+    "frame_path": "demo_frames/normal/frame_0045.jpg",
+    "frame_type": "normal",
+    "event": null
+  },
+  {
+    "frame_index": 46,
+    "frame_path": "demo_frames/normal/frame_0046.jpg",
+    "frame_type": "normal",
+    "event": null
+  },
+  {
+    "frame_index": 47,
+    "frame_path": "demo_frames/normal/frame_0047.jpg",
+    "frame_type": "normal",
+    "event": null
+  },
+  {
+    "frame_index": 48,
+    "frame_path": "demo_frames/normal/frame_0048.jpg",
+    "frame_type": "normal",
+    "event": null
+  },
+  {
+    "frame_index": 49,
+    "frame_path": "demo_frames/normal/frame_0049.jpg",
+    "frame_type": "normal",
+    "event": null
+  },
+  {
+    "frame_index": 50,
+    "frame_path": "demo_frames/normal/frame_0050.jpg",
+    "frame_type": "normal",
+    "event": null
+  },
+  {
+    "frame_index": 51,
+    "frame_path": "demo_frames/normal/frame_0051.jpg",
+    "frame_type": "normal",
+    "event": null
+  },
+  {
+    "frame_index": 52,
+    "frame_path": "demo_frames/normal/frame_0052.jpg",
+    "frame_type": "normal",
+    "event": null
+  },
+  {
+    "frame_index": 53,
+    "frame_path": "demo_frames/normal/frame_0053.jpg",
+    "frame_type": "normal",
+    "event": null
+  },
+  {
+    "frame_index": 54,
+    "frame_path": "demo_frames/normal/frame_0054.jpg",
+    "frame_type": "normal",
+    "event": null
+  },
+  {
+    "frame_index": 55,
+    "frame_path": "demo_frames/normal/frame_0055.jpg",
+    "frame_type": "normal",
+    "event": null
+  },
+  {
+    "frame_index": 56,
+    "frame_path": "demo_frames/normal/frame_0056.jpg",
+    "frame_type": "normal",
+    "event": null
+  },
+  {
+    "frame_index": 57,
+    "frame_path": "demo_frames/normal/frame_0057.jpg",
+    "frame_type": "normal",
+    "event": null
+  },
+  {
+    "frame_index": 58,
+    "frame_path": "demo_frames/normal/frame_0058.jpg",
+    "frame_type": "normal",
+    "event": null
+  },
+  {
+    "frame_index": 59,
+    "frame_path": "demo_frames/normal/frame_0059.jpg",
+    "frame_type": "normal",
+    "event": null
+  },
+  {
+    "frame_index": 60,
+    "frame_path": "demo_frames/normal/frame_0060.jpg",
+    "frame_type": "normal",
+    "event": null
+  },
+  {
+    "frame_index": 61,
+    "frame_path": "demo_frames/normal/frame_0061.jpg",
+    "frame_type": "normal",
+    "event": null
+  },
+  {
+    "frame_index": 62,
+    "frame_path": "demo_frames/normal/frame_0062.jpg",
+    "frame_type": "normal",
+    "event": null
+  },
+  {
+    "frame_index": 63,
+    "frame_path": "demo_frames/normal/frame_0063.jpg",
+    "frame_type": "normal",
+    "event": null
+  },
+  {
+    "frame_index": 64,
+    "frame_path": "demo_frames/normal/frame_0064.jpg",
+    "frame_type": "normal",
+    "event": null
+  },
+  {
+    "frame_index": 65,
+    "frame_path": "demo_frames/normal/frame_0065.jpg",
+    "frame_type": "normal",
+    "event": null
+  },
+  {
+    "frame_index": 66,
+    "frame_path": "demo_frames/normal/frame_0066.jpg",
+    "frame_type": "normal",
+    "event": null
+  },
+  {
+    "frame_index": 67,
+    "frame_path": "demo_frames/normal/frame_0067.jpg",
+    "frame_type": "normal",
+    "event": null
+  },
+  {
+    "frame_index": 68,
+    "frame_path": "demo_frames/normal/frame_0068.jpg",
+    "frame_type": "normal",
+    "event": null
+  },
+  {
+    "frame_index": 69,
+    "frame_path": "demo_frames/normal/frame_0069.jpg",
+    "frame_type": "normal",
+    "event": null
+  },
+  {
+    "frame_index": 70,
+    "frame_path": "demo_frames/normal/frame_0070.jpg",
+    "frame_type": "normal",
+    "event": null
+  },
+  {
+    "frame_index": 71,
+    "frame_path": "demo_frames/normal/frame_0071.jpg",
+    "frame_type": "normal",
+    "event": null
+  },
+  {
+    "frame_index": 72,
+    "frame_path": "demo_frames/normal/frame_0072.jpg",
+    "frame_type": "normal",
+    "event": null
+  },
+  {
+    "frame_index": 73,
+    "frame_path": "demo_frames/normal/frame_0073.jpg",
+    "frame_type": "normal",
+    "event": null
+  },
+  {
+    "frame_index": 74,
+    "frame_path": "demo_frames/normal/frame_0074.jpg",
+    "frame_type": "normal",
+    "event": null
+  },
+  {
+    "frame_index": 75,
+    "frame_path": "demo_frames/normal/frame_0075.jpg",
+    "frame_type": "normal",
+    "event": null
+  },
+  {
+    "frame_index": 76,
+    "frame_path": "demo_frames/normal/frame_0076.jpg",
+    "frame_type": "normal",
+    "event": null
+  },
+  {
+    "frame_index": 77,
+    "frame_path": "demo_frames/normal/frame_0077.jpg",
+    "frame_type": "normal",
+    "event": null
+  },
+  {
+    "frame_index": 78,
+    "frame_path": "demo_frames/normal/frame_0078.jpg",
+    "frame_type": "normal",
+    "event": null
+  },
+  {
+    "frame_index": 79,
+    "frame_path": "demo_frames/normal/frame_0079.jpg",
+    "frame_type": "normal",
+    "event": null
+  },
+  {
+    "frame_index": 80,
+    "frame_path": "demo_frames/anomaly/frame_0000.jpg",
+    "frame_type": "anomaly",
+    "event": {
+      "event_id": "17a7c30a-7e62-40bf-9341-e0af0bd894c3",
+      "domain": "physical",
+      "source": "META_VISION",
+      "record_type": "live_signal",
+      "event_type": "visual_anomaly",
+      "is_live": true,
+      "is_simulated": false,
+      "title": "Visual anomaly detected at Substation Alpha",
+      "description": "DINOv2 anomaly score 0.0981. SAM segmentation confidence 0.9594. Object bounding box [0, 163, 223, 223].",
+      "facility": "Substation Alpha",
+      "city": "",
+      "country": "USA",
+      "sector": "critical_infrastructure",
+      "infrastructure_type": "ICS/SCADA",
+      "risk_domain": "physical_security",
+      "risk_subdomain": "unauthorized_access",
+      "severity": 1,
+      "physical_consequence": true,
+      "critical_service_impact": true,
+      "intent": "unknown",
+      "vulnerability": "",
+      "technique_id": "T0817",
+      "tags": "visual_anomaly,dino,sam,meta",
+      "source_priority": 1,
+      "timestamp": "2026-04-18T18:30:12.217558+00:00",
+      "bbox": "[0, 163, 223, 223]",
+      "anomaly_score": 0.0981,
+      "sam_confidence": 0.9594
+    }
+  },
+  {
+    "frame_index": 81,
+    "frame_path": "demo_frames/anomaly/frame_0001.jpg",
+    "frame_type": "anomaly",
+    "event": {
+      "event_id": "216d4be3-064d-446b-a341-5ef1a4354e9d",
+      "domain": "physical",
+      "source": "META_VISION",
+      "record_type": "live_signal",
+      "event_type": "visual_anomaly",
+      "is_live": true,
+      "is_simulated": false,
+      "title": "Visual anomaly detected at Substation Alpha",
+      "description": "DINOv2 anomaly score 0.0924. SAM segmentation confidence 0.9677. Object bounding box [0, 164, 223, 223].",
+      "facility": "Substation Alpha",
+      "city": "",
+      "country": "USA",
+      "sector": "critical_infrastructure",
+      "infrastructure_type": "ICS/SCADA",
+      "risk_domain": "physical_security",
+      "risk_subdomain": "unauthorized_access",
+      "severity": 1,
+      "physical_consequence": true,
+      "critical_service_impact": true,
+      "intent": "unknown",
+      "vulnerability": "",
+      "technique_id": "T0817",
+      "tags": "visual_anomaly,dino,sam,meta",
+      "source_priority": 1,
+      "timestamp": "2026-04-18T18:30:14.376684+00:00",
+      "bbox": "[0, 164, 223, 223]",
+      "anomaly_score": 0.0924,
+      "sam_confidence": 0.9677
+    }
+  },
+  {
+    "frame_index": 82,
+    "frame_path": "demo_frames/anomaly/frame_0002.jpg",
+    "frame_type": "anomaly",
+    "event": {
+      "event_id": "13734191-bb76-451f-a44b-ae89e8b162a6",
+      "domain": "physical",
+      "source": "META_VISION",
+      "record_type": "live_signal",
+      "event_type": "visual_anomaly",
+      "is_live": true,
+      "is_simulated": false,
+      "title": "Visual anomaly detected at Substation Alpha",
+      "description": "DINOv2 anomaly score 0.094. SAM segmentation confidence 0.9758. Object bounding box [0, 0, 223, 223].",
+      "facility": "Substation Alpha",
+      "city": "",
+      "country": "USA",
+      "sector": "critical_infrastructure",
+      "infrastructure_type": "ICS/SCADA",
+      "risk_domain": "physical_security",
+      "risk_subdomain": "unauthorized_access",
+      "severity": 1,
+      "physical_consequence": true,
+      "critical_service_impact": true,
+      "intent": "unknown",
+      "vulnerability": "",
+      "technique_id": "T0817",
+      "tags": "visual_anomaly,dino,sam,meta",
+      "source_priority": 1,
+      "timestamp": "2026-04-18T18:30:16.563691+00:00",
+      "bbox": "[0, 0, 223, 223]",
+      "anomaly_score": 0.094,
+      "sam_confidence": 0.9758
+    }
+  },
+  {
+    "frame_index": 83,
+    "frame_path": "demo_frames/anomaly/frame_0003.jpg",
+    "frame_type": "anomaly",
+    "event": {
+      "event_id": "a2b13d13-b12d-487f-baea-38c844b7d632",
+      "domain": "physical",
+      "source": "META_VISION",
+      "record_type": "live_signal",
+      "event_type": "visual_anomaly",
+      "is_live": true,
+      "is_simulated": false,
+      "title": "Visual anomaly detected at Substation Alpha",
+      "description": "DINOv2 anomaly score 0.0826. SAM segmentation confidence 0.9848. Object bounding box [0, 163, 223, 223].",
+      "facility": "Substation Alpha",
+      "city": "",
+      "country": "USA",
+      "sector": "critical_infrastructure",
+      "infrastructure_type": "ICS/SCADA",
+      "risk_domain": "physical_security",
+      "risk_subdomain": "unauthorized_access",
+      "severity": 1,
+      "physical_consequence": true,
+      "critical_service_impact": true,
+      "intent": "unknown",
+      "vulnerability": "",
+      "technique_id": "T0817",
+      "tags": "visual_anomaly,dino,sam,meta",
+      "source_priority": 1,
+      "timestamp": "2026-04-18T18:30:18.738385+00:00",
+      "bbox": "[0, 163, 223, 223]",
+      "anomaly_score": 0.0826,
+      "sam_confidence": 0.9848
+    }
+  },
+  {
+    "frame_index": 84,
+    "frame_path": "demo_frames/anomaly/frame_0004.jpg",
+    "frame_type": "anomaly",
+    "event": {
+      "event_id": "2163bb94-67ca-4152-a126-a90bb5e40d3f",
+      "domain": "physical",
+      "source": "META_VISION",
+      "record_type": "live_signal",
+      "event_type": "visual_anomaly",
+      "is_live": true,
+      "is_simulated": false,
+      "title": "Visual anomaly detected at Substation Alpha",
+      "description": "DINOv2 anomaly score 0.0863. SAM segmentation confidence 0.9524. Object bounding box [0, 163, 223, 223].",
+      "facility": "Substation Alpha",
+      "city": "",
+      "country": "USA",
+      "sector": "critical_infrastructure",
+      "infrastructure_type": "ICS/SCADA",
+      "risk_domain": "physical_security",
+      "risk_subdomain": "unauthorized_access",
+      "severity": 1,
+      "physical_consequence": true,
+      "critical_service_impact": true,
+      "intent": "unknown",
+      "vulnerability": "",
+      "technique_id": "T0817",
+      "tags": "visual_anomaly,dino,sam,meta",
+      "source_priority": 1,
+      "timestamp": "2026-04-18T18:30:20.892242+00:00",
+      "bbox": "[0, 163, 223, 223]",
+      "anomaly_score": 0.0863,
+      "sam_confidence": 0.9524
+    }
+  },
+  {
+    "frame_index": 85,
+    "frame_path": "demo_frames/anomaly/frame_0005.jpg",
+    "frame_type": "anomaly",
+    "event": {
+      "event_id": "ca391033-5740-4977-9620-f86782a5f521",
+      "domain": "physical",
+      "source": "META_VISION",
+      "record_type": "live_signal",
+      "event_type": "visual_anomaly",
+      "is_live": true,
+      "is_simulated": false,
+      "title": "Visual anomaly detected at Substation Alpha",
+      "description": "DINOv2 anomaly score 0.088. SAM segmentation confidence 0.9464. Object bounding box [0, 0, 223, 223].",
+      "facility": "Substation Alpha",
+      "city": "",
+      "country": "USA",
+      "sector": "critical_infrastructure",
+      "infrastructure_type": "ICS/SCADA",
+      "risk_domain": "physical_security",
+      "risk_subdomain": "unauthorized_access",
+      "severity": 1,
+      "physical_consequence": true,
+      "critical_service_impact": true,
+      "intent": "unknown",
+      "vulnerability": "",
+      "technique_id": "T0817",
+      "tags": "visual_anomaly,dino,sam,meta",
+      "source_priority": 1,
+      "timestamp": "2026-04-18T18:30:23.091375+00:00",
+      "bbox": "[0, 0, 223, 223]",
+      "anomaly_score": 0.088,
+      "sam_confidence": 0.9464
+    }
+  },
+  {
+    "frame_index": 86,
+    "frame_path": "demo_frames/anomaly/frame_0006.jpg",
+    "frame_type": "anomaly",
+    "event": {
+      "event_id": "8001aea7-877d-47eb-990b-50d221c6a066",
+      "domain": "physical",
+      "source": "META_VISION",
+      "record_type": "live_signal",
+      "event_type": "visual_anomaly",
+      "is_live": true,
+      "is_simulated": false,
+      "title": "Visual anomaly detected at Substation Alpha",
+      "description": "DINOv2 anomaly score 0.1054. SAM segmentation confidence 0.9505. Object bounding box [0, 0, 223, 223].",
+      "facility": "Substation Alpha",
+      "city": "",
+      "country": "USA",
+      "sector": "critical_infrastructure",
+      "infrastructure_type": "ICS/SCADA",
+      "risk_domain": "physical_security",
+      "risk_subdomain": "unauthorized_access",
+      "severity": 1,
+      "physical_consequence": true,
+      "critical_service_impact": true,
+      "intent": "unknown",
+      "vulnerability": "",
+      "technique_id": "T0817",
+      "tags": "visual_anomaly,dino,sam,meta",
+      "source_priority": 1,
+      "timestamp": "2026-04-18T18:30:25.263718+00:00",
+      "bbox": "[0, 0, 223, 223]",
+      "anomaly_score": 0.1054,
+      "sam_confidence": 0.9505
+    }
+  },
+  {
+    "frame_index": 87,
+    "frame_path": "demo_frames/anomaly/frame_0007.jpg",
+    "frame_type": "anomaly",
+    "event": {
+      "event_id": "5c869883-c48b-4ddf-9e43-4f21e0699cdc",
+      "domain": "physical",
+      "source": "META_VISION",
+      "record_type": "live_signal",
+      "event_type": "visual_anomaly",
+      "is_live": true,
+      "is_simulated": false,
+      "title": "Visual anomaly detected at Substation Alpha",
+      "description": "DINOv2 anomaly score 0.1151. SAM segmentation confidence 0.9857. Object bounding box [0, 163, 223, 223].",
+      "facility": "Substation Alpha",
+      "city": "",
+      "country": "USA",
+      "sector": "critical_infrastructure",
+      "infrastructure_type": "ICS/SCADA",
+      "risk_domain": "physical_security",
+      "risk_subdomain": "unauthorized_access",
+      "severity": 1,
+      "physical_consequence": true,
+      "critical_service_impact": true,
+      "intent": "unknown",
+      "vulnerability": "",
+      "technique_id": "T0817",
+      "tags": "visual_anomaly,dino,sam,meta",
+      "source_priority": 1,
+      "timestamp": "2026-04-18T18:30:27.483899+00:00",
+      "bbox": "[0, 163, 223, 223]",
+      "anomaly_score": 0.1151,
+      "sam_confidence": 0.9857
+    }
+  },
+  {
+    "frame_index": 88,
+    "frame_path": "demo_frames/anomaly/frame_0008.jpg",
+    "frame_type": "anomaly",
+    "event": {
+      "event_id": "e13de944-8206-43ac-93d8-e6d0895edb11",
+      "domain": "physical",
+      "source": "META_VISION",
+      "record_type": "live_signal",
+      "event_type": "visual_anomaly",
+      "is_live": true,
+      "is_simulated": false,
+      "title": "Visual anomaly detected at Substation Alpha",
+      "description": "DINOv2 anomaly score 0.1042. SAM segmentation confidence 0.9484. Object bounding box [0, 0, 223, 223].",
+      "facility": "Substation Alpha",
+      "city": "",
+      "country": "USA",
+      "sector": "critical_infrastructure",
+      "infrastructure_type": "ICS/SCADA",
+      "risk_domain": "physical_security",
+      "risk_subdomain": "unauthorized_access",
+      "severity": 1,
+      "physical_consequence": true,
+      "critical_service_impact": true,
+      "intent": "unknown",
+      "vulnerability": "",
+      "technique_id": "T0817",
+      "tags": "visual_anomaly,dino,sam,meta",
+      "source_priority": 1,
+      "timestamp": "2026-04-18T18:30:29.669563+00:00",
+      "bbox": "[0, 0, 223, 223]",
+      "anomaly_score": 0.1042,
+      "sam_confidence": 0.9484
+    }
+  },
+  {
+    "frame_index": 89,
+    "frame_path": "demo_frames/anomaly/frame_0009.jpg",
+    "frame_type": "anomaly",
+    "event": {
+      "event_id": "f4ff6fdd-53ed-4540-8adf-8ffd77dbdd97",
+      "domain": "physical",
+      "source": "META_VISION",
+      "record_type": "live_signal",
+      "event_type": "visual_anomaly",
+      "is_live": true,
+      "is_simulated": false,
+      "title": "Visual anomaly detected at Substation Alpha",
+      "description": "DINOv2 anomaly score 0.1244. SAM segmentation confidence 0.9527. Object bounding box [0, 0, 223, 223].",
+      "facility": "Substation Alpha",
+      "city": "",
+      "country": "USA",
+      "sector": "critical_infrastructure",
+      "infrastructure_type": "ICS/SCADA",
+      "risk_domain": "physical_security",
+      "risk_subdomain": "unauthorized_access",
+      "severity": 1,
+      "physical_consequence": true,
+      "critical_service_impact": true,
+      "intent": "unknown",
+      "vulnerability": "",
+      "technique_id": "T0817",
+      "tags": "visual_anomaly,dino,sam,meta",
+      "source_priority": 1,
+      "timestamp": "2026-04-18T18:30:31.823601+00:00",
+      "bbox": "[0, 0, 223, 223]",
+      "anomaly_score": 0.1244,
+      "sam_confidence": 0.9527
+    }
+  },
+  {
+    "frame_index": 90,
+    "frame_path": "demo_frames/anomaly/frame_0010.jpg",
+    "frame_type": "anomaly",
+    "event": {
+      "event_id": "0a6252dc-3fff-4e12-a23a-2ee59aea4d9e",
+      "domain": "physical",
+      "source": "META_VISION",
+      "record_type": "live_signal",
+      "event_type": "visual_anomaly",
+      "is_live": true,
+      "is_simulated": false,
+      "title": "Visual anomaly detected at Substation Alpha",
+      "description": "DINOv2 anomaly score 0.1145. SAM segmentation confidence 0.9551. Object bounding box [0, 0, 223, 223].",
+      "facility": "Substation Alpha",
+      "city": "",
+      "country": "USA",
+      "sector": "critical_infrastructure",
+      "infrastructure_type": "ICS/SCADA",
+      "risk_domain": "physical_security",
+      "risk_subdomain": "unauthorized_access",
+      "severity": 1,
+      "physical_consequence": true,
+      "critical_service_impact": true,
+      "intent": "unknown",
+      "vulnerability": "",
+      "technique_id": "T0817",
+      "tags": "visual_anomaly,dino,sam,meta",
+      "source_priority": 1,
+      "timestamp": "2026-04-18T18:30:34.130260+00:00",
+      "bbox": "[0, 0, 223, 223]",
+      "anomaly_score": 0.1145,
+      "sam_confidence": 0.9551
+    }
+  },
+  {
+    "frame_index": 91,
+    "frame_path": "demo_frames/anomaly/frame_0011.jpg",
+    "frame_type": "anomaly",
+    "event": {
+      "event_id": "0c635224-f85a-4429-add9-5abd3d8017b5",
+      "domain": "physical",
+      "source": "META_VISION",
+      "record_type": "live_signal",
+      "event_type": "visual_anomaly",
+      "is_live": true,
+      "is_simulated": false,
+      "title": "Visual anomaly detected at Substation Alpha",
+      "description": "DINOv2 anomaly score 0.1205. SAM segmentation confidence 0.987. Object bounding box [0, 164, 223, 223].",
+      "facility": "Substation Alpha",
+      "city": "",
+      "country": "USA",
+      "sector": "critical_infrastructure",
+      "infrastructure_type": "ICS/SCADA",
+      "risk_domain": "physical_security",
+      "risk_subdomain": "unauthorized_access",
+      "severity": 1,
+      "physical_consequence": true,
+      "critical_service_impact": true,
+      "intent": "unknown",
+      "vulnerability": "",
+      "technique_id": "T0817",
+      "tags": "visual_anomaly,dino,sam,meta",
+      "source_priority": 1,
+      "timestamp": "2026-04-18T18:30:36.270463+00:00",
+      "bbox": "[0, 164, 223, 223]",
+      "anomaly_score": 0.1205,
+      "sam_confidence": 0.987
+    }
+  },
+  {
+    "frame_index": 92,
+    "frame_path": "demo_frames/anomaly/frame_0012.jpg",
+    "frame_type": "anomaly",
+    "event": {
+      "event_id": "e0bb8607-4eb6-4d6e-b6ea-6bbb8aab60ab",
+      "domain": "physical",
+      "source": "META_VISION",
+      "record_type": "live_signal",
+      "event_type": "visual_anomaly",
+      "is_live": true,
+      "is_simulated": false,
+      "title": "Visual anomaly detected at Substation Alpha",
+      "description": "DINOv2 anomaly score 0.1545. SAM segmentation confidence 0.9749. Object bounding box [0, 164, 223, 223].",
+      "facility": "Substation Alpha",
+      "city": "",
+      "country": "USA",
+      "sector": "critical_infrastructure",
+      "infrastructure_type": "ICS/SCADA",
+      "risk_domain": "physical_security",
+      "risk_subdomain": "unauthorized_access",
+      "severity": 1,
+      "physical_consequence": true,
+      "critical_service_impact": true,
+      "intent": "unknown",
+      "vulnerability": "",
+      "technique_id": "T0817",
+      "tags": "visual_anomaly,dino,sam,meta",
+      "source_priority": 1,
+      "timestamp": "2026-04-18T18:30:38.399178+00:00",
+      "bbox": "[0, 164, 223, 223]",
+      "anomaly_score": 0.1545,
+      "sam_confidence": 0.9749
+    }
+  },
+  {
+    "frame_index": 93,
+    "frame_path": "demo_frames/anomaly/frame_0013.jpg",
+    "frame_type": "anomaly",
+    "event": {
+      "event_id": "20f1b157-5798-4954-8716-a97c3d53f898",
+      "domain": "physical",
+      "source": "META_VISION",
+      "record_type": "live_signal",
+      "event_type": "visual_anomaly",
+      "is_live": true,
+      "is_simulated": false,
+      "title": "Visual anomaly detected at Substation Alpha",
+      "description": "DINOv2 anomaly score 0.1369. SAM segmentation confidence 0.9912. Object bounding box [0, 164, 223, 223].",
+      "facility": "Substation Alpha",
+      "city": "",
+      "country": "USA",
+      "sector": "critical_infrastructure",
+      "infrastructure_type": "ICS/SCADA",
+      "risk_domain": "physical_security",
+      "risk_subdomain": "unauthorized_access",
+      "severity": 1,
+      "physical_consequence": true,
+      "critical_service_impact": true,
+      "intent": "unknown",
+      "vulnerability": "",
+      "technique_id": "T0817",
+      "tags": "visual_anomaly,dino,sam,meta",
+      "source_priority": 1,
+      "timestamp": "2026-04-18T18:30:40.580812+00:00",
+      "bbox": "[0, 164, 223, 223]",
+      "anomaly_score": 0.1369,
+      "sam_confidence": 0.9912
+    }
+  },
+  {
+    "frame_index": 94,
+    "frame_path": "demo_frames/anomaly/frame_0014.jpg",
+    "frame_type": "anomaly",
+    "event": {
+      "event_id": "df91cb49-c81e-496a-a5dc-e019b7b0a819",
+      "domain": "physical",
+      "source": "META_VISION",
+      "record_type": "live_signal",
+      "event_type": "visual_anomaly",
+      "is_live": true,
+      "is_simulated": false,
+      "title": "Visual anomaly detected at Substation Alpha",
+      "description": "DINOv2 anomaly score 0.1357. SAM segmentation confidence 0.9769. Object bounding box [0, 164, 223, 223].",
+      "facility": "Substation Alpha",
+      "city": "",
+      "country": "USA",
+      "sector": "critical_infrastructure",
+      "infrastructure_type": "ICS/SCADA",
+      "risk_domain": "physical_security",
+      "risk_subdomain": "unauthorized_access",
+      "severity": 1,
+      "physical_consequence": true,
+      "critical_service_impact": true,
+      "intent": "unknown",
+      "vulnerability": "",
+      "technique_id": "T0817",
+      "tags": "visual_anomaly,dino,sam,meta",
+      "source_priority": 1,
+      "timestamp": "2026-04-18T18:30:42.706818+00:00",
+      "bbox": "[0, 164, 223, 223]",
+      "anomaly_score": 0.1357,
+      "sam_confidence": 0.9769
+    }
+  },
+  {
+    "frame_index": 95,
+    "frame_path": "demo_frames/anomaly/frame_0015.jpg",
+    "frame_type": "anomaly",
+    "event": {
+      "event_id": "aa230d6e-33a9-4041-b511-cf9f154c7c1b",
+      "domain": "physical",
+      "source": "META_VISION",
+      "record_type": "live_signal",
+      "event_type": "visual_anomaly",
+      "is_live": true,
+      "is_simulated": false,
+      "title": "Visual anomaly detected at Substation Alpha",
+      "description": "DINOv2 anomaly score 0.1379. SAM segmentation confidence 0.947. Object bounding box [0, 0, 223, 223].",
+      "facility": "Substation Alpha",
+      "city": "",
+      "country": "USA",
+      "sector": "critical_infrastructure",
+      "infrastructure_type": "ICS/SCADA",
+      "risk_domain": "physical_security",
+      "risk_subdomain": "unauthorized_access",
+      "severity": 1,
+      "physical_consequence": true,
+      "critical_service_impact": true,
+      "intent": "unknown",
+      "vulnerability": "",
+      "technique_id": "T0817",
+      "tags": "visual_anomaly,dino,sam,meta",
+      "source_priority": 1,
+      "timestamp": "2026-04-18T18:30:44.855692+00:00",
+      "bbox": "[0, 0, 223, 223]",
+      "anomaly_score": 0.1379,
+      "sam_confidence": 0.947
+    }
+  },
+  {
+    "frame_index": 96,
+    "frame_path": "demo_frames/anomaly/frame_0016.jpg",
+    "frame_type": "anomaly",
+    "event": {
+      "event_id": "3a22bf48-9a73-4975-96eb-a1c619f99f97",
+      "domain": "physical",
+      "source": "META_VISION",
+      "record_type": "live_signal",
+      "event_type": "visual_anomaly",
+      "is_live": true,
+      "is_simulated": false,
+      "title": "Visual anomaly detected at Substation Alpha",
+      "description": "DINOv2 anomaly score 0.1337. SAM segmentation confidence 0.983. Object bounding box [0, 163, 223, 223].",
+      "facility": "Substation Alpha",
+      "city": "",
+      "country": "USA",
+      "sector": "critical_infrastructure",
+      "infrastructure_type": "ICS/SCADA",
+      "risk_domain": "physical_security",
+      "risk_subdomain": "unauthorized_access",
+      "severity": 1,
+      "physical_consequence": true,
+      "critical_service_impact": true,
+      "intent": "unknown",
+      "vulnerability": "",
+      "technique_id": "T0817",
+      "tags": "visual_anomaly,dino,sam,meta",
+      "source_priority": 1,
+      "timestamp": "2026-04-18T18:30:47.117518+00:00",
+      "bbox": "[0, 163, 223, 223]",
+      "anomaly_score": 0.1337,
+      "sam_confidence": 0.983
+    }
+  },
+  {
+    "frame_index": 97,
+    "frame_path": "demo_frames/anomaly/frame_0017.jpg",
+    "frame_type": "anomaly",
+    "event": {
+      "event_id": "a16cbbcd-e759-491e-94b2-ad2c0dce39b3",
+      "domain": "physical",
+      "source": "META_VISION",
+      "record_type": "live_signal",
+      "event_type": "visual_anomaly",
+      "is_live": true,
+      "is_simulated": false,
+      "title": "Visual anomaly detected at Substation Alpha",
+      "description": "DINOv2 anomaly score 0.1461. SAM segmentation confidence 0.9835. Object bounding box [0, 163, 223, 223].",
+      "facility": "Substation Alpha",
+      "city": "",
+      "country": "USA",
+      "sector": "critical_infrastructure",
+      "infrastructure_type": "ICS/SCADA",
+      "risk_domain": "physical_security",
+      "risk_subdomain": "unauthorized_access",
+      "severity": 1,
+      "physical_consequence": true,
+      "critical_service_impact": true,
+      "intent": "unknown",
+      "vulnerability": "",
+      "technique_id": "T0817",
+      "tags": "visual_anomaly,dino,sam,meta",
+      "source_priority": 1,
+      "timestamp": "2026-04-18T18:30:49.269186+00:00",
+      "bbox": "[0, 163, 223, 223]",
+      "anomaly_score": 0.1461,
+      "sam_confidence": 0.9835
+    }
+  },
+  {
+    "frame_index": 98,
+    "frame_path": "demo_frames/anomaly/frame_0018.jpg",
+    "frame_type": "anomaly",
+    "event": {
+      "event_id": "b339b8a6-f794-4ef5-8ffe-e81f7326e78e",
+      "domain": "physical",
+      "source": "META_VISION",
+      "record_type": "live_signal",
+      "event_type": "visual_anomaly",
+      "is_live": true,
+      "is_simulated": false,
+      "title": "Visual anomaly detected at Substation Alpha",
+      "description": "DINOv2 anomaly score 0.1496. SAM segmentation confidence 0.9847. Object bounding box [0, 164, 223, 223].",
+      "facility": "Substation Alpha",
+      "city": "",
+      "country": "USA",
+      "sector": "critical_infrastructure",
+      "infrastructure_type": "ICS/SCADA",
+      "risk_domain": "physical_security",
+      "risk_subdomain": "unauthorized_access",
+      "severity": 1,
+      "physical_consequence": true,
+      "critical_service_impact": true,
+      "intent": "unknown",
+      "vulnerability": "",
+      "technique_id": "T0817",
+      "tags": "visual_anomaly,dino,sam,meta",
+      "source_priority": 1,
+      "timestamp": "2026-04-18T18:30:51.398012+00:00",
+      "bbox": "[0, 164, 223, 223]",
+      "anomaly_score": 0.1496,
+      "sam_confidence": 0.9847
+    }
+  },
+  {
+    "frame_index": 99,
+    "frame_path": "demo_frames/anomaly/frame_0019.jpg",
+    "frame_type": "anomaly",
+    "event": {
+      "event_id": "8538582d-0d1b-4b31-b714-008fe55fb968",
+      "domain": "physical",
+      "source": "META_VISION",
+      "record_type": "live_signal",
+      "event_type": "visual_anomaly",
+      "is_live": true,
+      "is_simulated": false,
+      "title": "Visual anomaly detected at Substation Alpha",
+      "description": "DINOv2 anomaly score 0.1384. SAM segmentation confidence 0.9469. Object bounding box [0, 0, 223, 223].",
+      "facility": "Substation Alpha",
+      "city": "",
+      "country": "USA",
+      "sector": "critical_infrastructure",
+      "infrastructure_type": "ICS/SCADA",
+      "risk_domain": "physical_security",
+      "risk_subdomain": "unauthorized_access",
+      "severity": 1,
+      "physical_consequence": true,
+      "critical_service_impact": true,
+      "intent": "unknown",
+      "vulnerability": "",
+      "technique_id": "T0817",
+      "tags": "visual_anomaly,dino,sam,meta",
+      "source_priority": 1,
+      "timestamp": "2026-04-18T18:30:53.548637+00:00",
+      "bbox": "[0, 0, 223, 223]",
+      "anomaly_score": 0.1384,
+      "sam_confidence": 0.9469
+    }
+  }
+]
