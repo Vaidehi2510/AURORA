@@ -1,0 +1,48 @@
+.view {
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  overflow: hidden;
+}
+
+.body {
+  flex: 1;
+  display: grid;
+  grid-template-columns: minmax(220px, 300px) minmax(0, 1fr) minmax(220px, 320px);
+  gap: 10px;
+  padding: 10px 20px;
+  overflow: hidden;
+}
+
+.leftCol {
+  display: grid;
+  grid-template-rows: 1fr auto;
+  gap: 10px;
+  overflow: hidden;
+  min-height: 0;
+}
+
+.mainCol {
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.mainCol > * {
+  flex: 1;
+  min-height: 0;
+}
+
+.sideFeed {
+  min-height: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.sideFeed > * {
+  flex: 1;
+  min-height: 0;
+}
