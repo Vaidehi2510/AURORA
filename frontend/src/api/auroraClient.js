@@ -45,6 +45,23 @@ export async function fetchSnapshot() {
   return res.json()
 }
 
+/**
+ * @returns {Promise<{ summary: object, domains: any[], sources: any[], events: any[], dbMissing?: boolean }>}
+ */
+export async function fetchRawData(options = {}) {
+  const params = new URLSearchParams()
+  for (const [key, value] of Object.entries(options)) {
+    if (value === undefined || value === null || value === '') continue
+    params.set(key, String(value))
+  }
+  const suffix = params.toString() ? `?${params.toString()}` : ''
+  const res = await fetch(apiUrl(`/api/raw-data${suffix}`))
+  if (!res.ok) {
+    throw new Error(`Raw data fetch failed (${res.status})`)
+  }
+  return res.json()
+}
+
 export async function runEngineOnServer() {
   const res = await fetch(apiUrl('/api/run-engine'), { method: 'POST' })
   if (!res.ok) {
