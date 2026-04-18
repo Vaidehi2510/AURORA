@@ -5,10 +5,11 @@ import NavTabs from './components/NavTabs.jsx'
 import DashboardView from './components/DashboardView.jsx'
 import MapView from './components/MapView.jsx'
 import TimelineView from './components/TimelineView.jsx'
+import RawDataView from './components/RawDataView.jsx'
 import ControlsView from './components/ControlsView.jsx'
 import styles from './styles/App.module.css'
 
-const TABS = ['dashboard', 'map', 'timeline', 'controls']
+const TABS = ['dashboard', 'map', 'timeline', 'data', 'controls']
 
 export default function App() {
   const [activeTab, setActiveTab] = useState('dashboard')
@@ -31,6 +32,7 @@ export default function App() {
         {activeTab === 'dashboard' && <DashboardView sentinel={sentinel} />}
         {activeTab === 'map'       && <MapView       sentinel={sentinel} />}
         {activeTab === 'timeline'  && <TimelineView  sentinel={sentinel} />}
+        {activeTab === 'data'      && <RawDataView   sentinel={sentinel} />}
         {activeTab === 'controls'  && <ControlsView  sentinel={sentinel} />}
       </div>
     </div>

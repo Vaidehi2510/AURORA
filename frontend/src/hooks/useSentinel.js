@@ -5,6 +5,7 @@ import { synthesizeAlert } from '../engine/llmSynthesis.js'
 import { DEFAULT_PARAMS, EVENT_TYPES } from '../data/constants.js'
 import {
   auroraApiConfigured,
+  fetchRawData,
   fetchSnapshot,
   runEngineOnServer,
 } from '../api/auroraClient.js'
@@ -18,6 +19,16 @@ export function useSentinel() {
   const [events,          setEvents]         = useState([])
   const [alerts,          setAlerts]         = useState([])
   const [ticker,          setTicker]         = useState([])
+  const [rawData,         setRawData]        = useState({
+    summary: {},
+    domains: [],
+    sources: [],
+    events: [],
+    matchingEvents: 0,
+    limit: 100,
+    offset: 0,
+    dbMissing: false,
+  })
   const [selectedAlertId, setSelectedAlertId]= useState(null)
   const [running,         setRunning]        = useState(false)
   const [params,          setParams]         = useState(DEFAULT_PARAMS)
@@ -65,6 +76,17 @@ export function useSentinel() {
       setLiveError(e instanceof Error ? e.message : 'Could not reach AURORA API')
     }
   }, [applySnapshot])
+
+  const loadRawDataOnce = useCallback(async (options = {}) => {
+    if (!auroraApiConfigured()) return
+    try {
+      const data = await fetchRawData(options)
+      setRawData(data)
+      setLiveError(null)
+    } catch (e) {
+      setLiveError(e instanceof Error ? e.message : 'Could not reach AURORA API')
+    }
+  }, [])
 
   useEffect(() => {
     if (!auroraApiConfigured() || !liveMode) {
@@ -231,6 +253,10 @@ export function useSentinel() {
     if (liveModeRef.current) pollOnce()
   }, [pollOnce])
 
+  const refreshRawData = useCallback((options = {}) => {
+    loadRawDataOnce(options)
+  }, [loadRawDataOnce])
+
   const runBackendEngine = useCallback(async () => {
     if (!auroraApiConfigured()) return
     setEngineRunning(true)
@@ -265,9 +291,11 @@ export function useSentinel() {
     ingestEvent,
     liveMode,
     liveError,
+    rawData,
     liveApiAvailable: auroraApiConfigured(),
     toggleLiveMode,
     refreshLive,
+    refreshRawData,
     runBackendEngine,
     engineRunning,
   }
