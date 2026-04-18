@@ -1,7 +1,13 @@
 import React, { useState, useEffect } from 'react'
 import styles from './Header.module.css'
 
-export default function Header({ running, totalIngested, liveMode, liveError }) {
+export default function Header({
+  running,
+  totalIngested,
+  liveMode,
+  liveFeedPaused = false,
+  liveError,
+}) {
   const [time, setTime] = useState('')
 
   useEffect(() => {
@@ -20,11 +26,23 @@ export default function Header({ running, totalIngested, liveMode, liveError }) 
 
       <div
         className={`${styles.statusPill} ${
-          liveMode ? styles.liveDb : running ? styles.live : styles.paused
+          liveMode && !liveFeedPaused
+            ? styles.liveDb
+            : liveMode && liveFeedPaused
+              ? styles.paused
+              : running
+                ? styles.live
+                : styles.paused
         }`}
         title={liveError || ''}
       >
-        {liveMode ? '◉ AURORA DB' : running ? '● LIVE' : '◼ PAUSED'}
+        {liveMode
+          ? liveFeedPaused
+            ? '◼ DB PAUSED'
+            : '◉ AURORA DB'
+          : running
+            ? '● LIVE'
+            : '◼ PAUSED'}
       </div>
 
       <div className={styles.feedCount}>

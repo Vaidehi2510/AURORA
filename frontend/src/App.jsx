@@ -20,6 +20,7 @@ export default function App() {
         running={sentinel.running}
         totalIngested={sentinel.stats.rawEvents}
         liveMode={sentinel.liveMode}
+        liveFeedPaused={sentinel.liveFeedPaused}
         liveError={sentinel.liveError}
       />
       <NavTabs

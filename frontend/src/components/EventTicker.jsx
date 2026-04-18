@@ -3,13 +3,45 @@ import styles from './EventTicker.module.css'
 
 const TYPE_COLOR = { cyber: 'var(--blue)', physical: 'var(--amber)', osint: 'var(--purple)' }
 
-export default function EventTicker({ events }) {
+export default function EventTicker({
+  events,
+  feedActive = true,
+  onToggleFeed,
+  feedToggleDisabled = false,
+  liveMode = false,
+}) {
+  const showToggle = typeof onToggleFeed === 'function'
+  const label = !feedActive
+    ? liveMode
+      ? 'Resume'
+      : 'Start'
+    : 'Pause'
+
   return (
     <div className={styles.panel}>
       <div className={styles.header}>
-        <span className={`${styles.dot} animate-pulse`} />
+        <span className={`${styles.dot} ${feedActive ? 'animate-pulse' : ''}`} />
         <span className={styles.title}>LIVE FEED</span>
         <span className={styles.count}>{events.length}</span>
+        {showToggle && (
+          <button
+            type="button"
+            className={`${styles.feedBtn} ${feedActive ? styles.feedBtnPause : styles.feedBtnStart}`}
+            disabled={feedToggleDisabled}
+            onClick={onToggleFeed}
+            title={
+              liveMode
+                ? feedActive
+                  ? 'Pause API polling (keep current events on screen)'
+                  : 'Resume API polling'
+                : feedActive
+                  ? 'Pause simulated events'
+                  : 'Start simulated events'
+            }
+          >
+            {label}
+          </button>
+        )}
       </div>
       <div className={styles.list}>
         {events.length === 0 && (
