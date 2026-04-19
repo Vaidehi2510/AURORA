@@ -1,6 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react'
-
-const API = 'http://127.0.0.1:8000'
+import { apiUrl, getAuroraApiBase } from './api/auroraClient.js'
 const RAW_PAGE_SIZE = 20
 
 const ANALYST_FIELDS = [
@@ -228,7 +227,7 @@ function App() {
   }
 
   const loadAnalystVerdicts = async () => {
-    const response = await fetch(`${API}/api/analyst-verdicts`)
+    const response = await fetch(apiUrl('/api/analyst-verdicts'))
     if (!response.ok) {
       throw new Error(`Analyst verdict fetch failed with ${response.status}`)
     }
@@ -244,7 +243,7 @@ function App() {
   }
 
   const loadSnapshot = async () => {
-    const response = await fetch(`${API}/api/snapshot`)
+    const response = await fetch(apiUrl('/api/snapshot'))
     if (!response.ok) {
       throw new Error(`Snapshot fetch failed with ${response.status}`)
     }
@@ -299,7 +298,7 @@ function App() {
     params.set('limit', String(rawLimit))
 
     try {
-      const response = await fetch(`${API}/api/raw-data?${params.toString()}`)
+      const response = await fetch(apiUrl(`/api/raw-data?${params.toString()}`))
       if (!response.ok) {
         throw new Error(`Raw data fetch failed with ${response.status}`)
       }
@@ -371,7 +370,7 @@ function App() {
       setVoiceError('')
       setPlaybackState({ status: 'loading', scope, key })
 
-      const response = await fetch(`${API}/api/voice/speak`, {
+      const response = await fetch(apiUrl('/api/voice/speak'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ text: cleaned }),
@@ -425,7 +424,7 @@ function App() {
     setChatMessages((current) => [...current, userMessage])
 
     try {
-      const response = await fetch(`${API}/api/analyst-chat`, {
+      const response = await fetch(apiUrl('/api/analyst-chat'), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -471,7 +470,7 @@ function App() {
       formData.append('file', blob, 'aurora-voice.webm')
       formData.append('context_json', JSON.stringify(buildVoiceContext(selectedAlert, alerts, liveEvents)))
 
-      const response = await fetch(`${API}/api/voice/transcribe`, {
+      const response = await fetch(apiUrl('/api/voice/transcribe'), {
         method: 'POST',
         body: formData,
       })
@@ -581,7 +580,7 @@ function App() {
     setErrorState('')
 
     try {
-      const response = await fetch(`${API}/api/run-engine`, { method: 'POST' })
+      const response = await fetch(apiUrl('/api/run-engine'), { method: 'POST' })
       if (!response.ok) {
         const detail = await extractErrorDetail(response, `Engine run failed (${response.status})`)
         throw new Error(detail)
@@ -599,7 +598,7 @@ function App() {
     setErrorState('')
 
     try {
-      const response = await fetch(`${API}/api/run-analyst`, { method: 'POST' })
+      const response = await fetch(apiUrl('/api/run-analyst'), { method: 'POST' })
       if (!response.ok) {
         const detail = await extractErrorDetail(response, `Analyst run failed (${response.status})`)
         throw new Error(detail)
@@ -614,7 +613,9 @@ function App() {
 
   const toggleLiveFeed = () => {
     if (!liveEvents.length && !allAlertsRef.current.length && liveEventQueueRef.current.length === 0) {
-      setErrorState(`No live snapshot data available from ${API}. Start the local API and refresh.`)
+      setErrorState(
+        `No live snapshot data yet (API base: ${getAuroraApiBase()}). Ensure the backend is running and refresh.`,
+      )
       return
     }
 
@@ -2952,7 +2953,7 @@ function pickSupportedMimeType() {
 }
 
 async function fetchJson(path) {
-  const response = await fetch(`${API}${path}`)
+  const response = await fetch(apiUrl(path))
   if (!response.ok) {
     throw new Error(await extractErrorDetail(response, `${path} failed (${response.status})`))
   }

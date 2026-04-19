@@ -26,7 +26,7 @@ export function getAuroraApiBase() {
   return resolveApiOrigin() || '(same-origin /api)'
 }
 
-function apiUrl(path) {
+export function apiUrl(path) {
   if (!path.startsWith('/')) throw new Error(`apiUrl expects absolute path, got ${path}`)
   const o = resolveApiOrigin()
   if (!o) return path
