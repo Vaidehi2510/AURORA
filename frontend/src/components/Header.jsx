@@ -1,13 +1,9 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import styles from './Header.module.css'
+import auroraLogo from '../../../aurora_logo_v3.svg'
+import NavTabs from './NavTabs.jsx'
 
-export default function Header({
-  running,
-  totalIngested,
-  liveMode,
-  liveFeedPaused = false,
-  liveError,
-}) {
+export default function Header({ tabs, activeTab, onTabChange }) {
   const [time, setTime] = useState('')
 
   useEffect(() => {
@@ -20,35 +16,17 @@ export default function Header({
   return (
     <header className={styles.header}>
       <div className={styles.logo}>
-        <div className={styles.logoIcon} />
-        <span>CROSSDOMAIN SENTINEL</span>
+        <img
+          className={styles.logoImage}
+          src={auroraLogo}
+          alt="AURORA"
+          loading="eager"
+          draggable="false"
+        />
       </div>
 
-      <div
-        className={`${styles.statusPill} ${
-          liveMode && !liveFeedPaused
-            ? styles.liveDb
-            : liveMode && liveFeedPaused
-              ? styles.paused
-              : running
-                ? styles.live
-                : styles.paused
-        }`}
-        title={liveError || ''}
-      >
-        {liveMode
-          ? liveFeedPaused
-            ? '◼ DB PAUSED'
-            : '◉ AURORA DB'
-          : running
-            ? '● LIVE'
-            : '◼ PAUSED'}
-      </div>
-
-      <div className={styles.feedCount}>
-        {liveMode
-          ? liveError ?? 'Synced from SQLite API'
-          : `${totalIngested.toLocaleString()} events ingested`}
+      <div className={styles.navSlot}>
+        <NavTabs tabs={tabs} active={activeTab} onChange={onTabChange} />
       </div>
 
       <div className={styles.right}>

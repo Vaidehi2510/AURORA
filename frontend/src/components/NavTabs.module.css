@@ -1,9 +1,12 @@
 .nav {
   display: flex;
-  background: var(--bg2);
-  border-bottom: 1px solid var(--border);
-  padding: 0 20px;
-  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 0;
+  background: transparent;
+  border-bottom: none;
+  flex-wrap: wrap;
 }
 
 .tab {
