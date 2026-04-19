@@ -1,4 +1,4 @@
-cat > app.py << 'ENDOFFILE'
+
 from __future__ import annotations
 
 import hashlib
@@ -560,4 +560,4 @@ def run_engine() -> dict[str, str]:
     ))
     engine.run()
     return {"status": "ok"}
-ENDOFFILE
+
